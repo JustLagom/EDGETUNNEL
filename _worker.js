@@ -34,7 +34,7 @@ export default {
 			const userAgent = request.headers.get('User-Agent').toLowerCase();
 			userID = env.UUID || userID;
 			proxyIP = env.PROXYIP || proxyIP;
-      dohURL = env.DNS_RESOLVER_URL || dohURL;
+                        dohURL = env.DNS_RESOLVER_URL || dohURL;
 			socks5Address = env.SOCKS5 || socks5Address;
 			sub = env.SUB || sub;
 			subconverter = env.SUBAPI || subconverter;
