@@ -5,9 +5,7 @@ let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
 let proxyIP = 'proxyip.justlagom.cloudns.org';
 
-let dohURL = 'https://dns.google/dns-query';
-
-let sub = 'sub.cmliucdn.tk';
+let sub = '200848a7-a9be-4546-bcc4-79b9bb10304a.cmliucdn.tk';
 
 let subconverter = 'api.v1.mk';
 
@@ -34,7 +32,6 @@ export default {
 			const userAgent = request.headers.get('User-Agent').toLowerCase();
 			userID = env.UUID || userID;
 			proxyIP = env.PROXYIP || proxyIP;
-                        dohURL = env.DNS_RESOLVER_URL || dohURL;
 			socks5Address = env.SOCKS5 || socks5Address;
 			sub = env.SUB || sub;
 			subconverter = env.SUBAPI || subconverter;
@@ -67,7 +64,7 @@ export default {
 					default:
 						// return new Response('Not found', { status: 404 });
 						// For any other path, reverse proxy to 'ramdom website' and return the original response, caching it in the process
-						const randomHostname = cn_hostnames[Math.floor(Math.random() * cn_hostnames.length)];
+						const randomHostname = 'speedtest.net';
 						const newHeaders = new Headers(request.headers);
 						newHeaders.set('cf-connecting-ip', '1.2.3.4');
 						newHeaders.set('x-forwarded-for', '1.2.3.4');
