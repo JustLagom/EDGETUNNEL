@@ -1,8 +1,6 @@
-## Cloudflare-workers/pages代理脚本
+## Cloudflare-pages代理脚本
 
-### 方案一支持workers部署：实现vless+ws+tls与vless+ws两种代理节点
-
-### 方案二支持pages部署：仅实现vless+ws+tls代理节点
+### 方案:pages部署-实现vless+ws+tls代理节点
 
 ------------------------------------------------------------------------
 ### CF vless代码（_worker.js文件）可修改内容及说明
