@@ -1,17 +1,17 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 
-let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
+let userID = '';// 使用cloudflare环境变量自定义UUID
 
 let proxyIP = '';// 使用cloudflare环境变量自定义PROXYIP
 
-let dohURL = 'https://dns.google/dns-query';
+let dohURL = '';// 使用cloudflare环境变量自定义DNS_RESOLVER_URL
 
 let sub = '';// 使用cloudflare环境变量自定义SUB
 
-let subconverter = 'api.v1.mk';
+let subconverter = '';// 使用cloudflare环境变量自定义SUBAPI
 
-let subconfig = "https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini";
+let subconfig = "";// 使用cloudflare环境变量自定义SUBCONFIG
 
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is invalid');
