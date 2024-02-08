@@ -3,7 +3,7 @@ import { connect } from 'cloudflare:sockets';
 
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
-let proxyIP = 'proxyip.justlagom.cloudns.org';
+let proxyIP = '';
 
 let dohURL = 'https://dns.google/dns-query';
 
