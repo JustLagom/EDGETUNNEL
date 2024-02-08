@@ -3,11 +3,11 @@ import { connect } from 'cloudflare:sockets';
 
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
-let proxyIP = '';
+let proxyIP = '';// 使用cloudflare环境变量自定义PROXYIP
 
 let dohURL = 'https://dns.google/dns-query';
 
-let sub = '200848a7-a9be-4546-bcc4-79b9bb10304a.cmliucdn.tk';
+let sub = '';// 使用cloudflare环境变量自定义SUB
 
 let subconverter = 'api.v1.mk';
 
