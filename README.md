@@ -9,7 +9,7 @@
 
 1、UUID必须自定义
 
-2、ProxyIP可更换为ProxyIP.txt文件中的ProxyIP，收集来源于网上各位大佬的分享，自定义
+2、ProxyIP可更换，收集来源于网上各位大佬的分享，自定义
 
 3、伪装网页已更新为librespeed.speedtestcustom.com，可自定义
 
