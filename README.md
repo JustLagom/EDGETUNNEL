@@ -1,13 +1,13 @@
 ## Cloudflare-pages代理脚本:
 
-### 方案:pages部署实现vless+ws伪装+tls代理节点.
+### PAGES部署实现VLESS+WS+TLS.
 
 ------------------------------------------------------------------------
 ### CF vless代码（_worker.js文件）可修改内容及说明:
 
 ### 1、UUID必须自定义.
 
-### 2、ProxyIP可更换，收集来源于网上各位大佬的分享，可自定义.
+### 2、ProxyIP更换，收集来源于网上各位大佬的分享，可自定义.
 
 ### 3、伪装网页已更新为librespeed.speedtestcustom.com，可自定义.
 
