@@ -1,18 +1,11 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
-
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
-
 let proxyIP = '';
-
 let sub = 'sub.cmliussss.workers.dev';// 订阅生成器
-
 let subconverter = 'proxysub.justlagom.workers.dev';// 订阅转换后端
-
 let subconfig = "https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini";// 订阅配置文件
-
 let socks5Address = '';// Example:  user:pass@host:port  or  host:port
-
 let RproxyIP = 'false';
 
 if (!isValidUUID(userID)) {
@@ -52,13 +45,10 @@ export default {
 			} else {
 				RproxyIP = env.RPROXYIP || !proxyIP ? 'true' : 'false';
 			}
-			let userID_Path = userID;
-			if (userID.includes(',')) {
-				userID_Path = userID.split(',')[0];
-			}
 			const upgradeHeader = request.headers.get('Upgrade');
+			const url = new URL(request.url);
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
-				const url = new URL(request.url);
+				// const url = new URL(request.url);
 				switch (url.pathname) {
 				case `/cf`:{
 					return new Response(JSON.stringify(request.cf, null, 4), {
