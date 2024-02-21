@@ -1,11 +1,11 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
-let proxyIP = '';
-let sub = 'sub.cmliussss.workers.dev';// 订阅生成器
-let subconverter = 'api.v1.mk';// 订阅转换后端
-let subconfig = "https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini";// 订阅配置文件
-let socks5Address = '';// Example:  user:pass@host:port  or  host:port
+let proxyIP = '';// path路径自定义
+let sub = '';// 订阅生成器
+let subconverter = '';// 订阅转换后端
+let subconfig = "";// 订阅配置文件
+let socks5Address = '';// 示例：user:pass@host:port  or  host:port
 let RproxyIP = 'false';
 
 if (!isValidUUID(userID)) {
