@@ -7,7 +7,7 @@ let proxyIP = '';// 优选反代IP
 
 let sub = 'sub.cmliussss.workers.dev';// 订阅生成器
 
-let subconverter = '';// 订阅转换后端
+let subconverter = 'proxysub.justlagom.workers.dev';// 订阅转换后端
 
 let subconfig = "https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini";// 订阅配置文件
 
