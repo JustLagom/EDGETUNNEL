@@ -3,11 +3,11 @@ import { connect } from 'cloudflare:sockets';
 
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
-let proxyIP = '';// 反代ip
+let proxyIP = '';// 优选反代IP
 
-let sub = '';// 优选订阅生成器，可自行搭建 https://github.com/cmliu/WorkerVless2sub
+let sub = '';// 订阅生成器
 
-let subconverter = '';// 订阅转换地址
+let subconverter = '';// 订阅转换后端
 
 let subconfig = "";// 订阅配置文件
 
@@ -78,33 +78,33 @@ export default {
 					});
 				}
 				default:
-						// return new Response('Not found', { status: 404 });
-						// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
-						const DisguiseHostname = 'librespeed.speedtestcustom.com';
-						const newHeaders = new Headers(request.headers);
-						newHeaders.set('cf-connecting-ip', '1.2.3.4');
-						newHeaders.set('x-forwarded-for', '1.2.3.4');
-						newHeaders.set('x-real-ip', '1.2.3.4');
-						newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
-						// Use fetch to proxy the request to 15 different domains
-						const proxyUrl = 'https://' + DisguiseHostname + url.pathname + url.search;
-						let modifiedRequest = new Request(proxyUrl, {
-							method: request.method,
-							headers: newHeaders,
-							body: request.body,
-							redirect: 'manual',
+					// return new Response('Not found', { status: 404 });
+					// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
+					const DisguiseHostname = 'librespeed.speedtestcustom.com';
+					const newHeaders = new Headers(request.headers);
+					newHeaders.set('cf-connecting-ip', '1.2.3.4');
+					newHeaders.set('x-forwarded-for', '1.2.3.4');
+					newHeaders.set('x-real-ip', '1.2.3.4');
+					newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
+					// Use fetch to proxy the request to 15 different domains
+					const proxyUrl = 'https://' + DisguiseHostname + url.pathname + url.search;
+					let modifiedRequest = new Request(proxyUrl, {
+						method: request.method,
+						headers: newHeaders,
+						body: request.body,
+						redirect: 'manual',
+					});
+					const proxyResponse = await fetch(modifiedRequest, { redirect: 'manual' });
+					// Check for 302 or 301 redirect status and return an error response
+					if ([301, 302].includes(proxyResponse.status)) {
+						return new Response(`Redirects to ${DisguiseHostname} are not allowed.`, {
+							status: 403,
+							statusText: 'Forbidden',
 						});
-						const proxyResponse = await fetch(modifiedRequest, { redirect: 'manual' });
-						// Check for 302 or 301 redirect status and return an error response
-						if ([301, 302].includes(proxyResponse.status)) {
-							return new Response(`Redirects to ${DisguiseHostname} are not allowed.`, {
-								status: 403,
-								statusText: 'Forbidden',
-							});
-						}
-						// Return the response from the proxy server
-						return proxyResponse;
-				}
+					}
+					// Return the response from the proxy server
+					return proxyResponse;
+			}
 			} else {
 				return await vlessOverWSHandler(request);
 			}
@@ -618,7 +618,7 @@ async function handleDNSQuery(udpChunk, webSocket, vlessResponseHeader, log) {
 	// no matter which DNS server client send, we alwasy use hard code one.
 	// beacsue someof DNS server is not support DNS over TCP
 	try {
-		const dnsServer = '8.8.4.4'; // change to 1.1.1.1 after cf fix connect own ip bug
+		const dnsServer = '8.8.4.4';// change to 1.1.1.1 after cf fix connect own ip bug
 		const dnsPort = 53;
 		/** @type {ArrayBuffer | null} */
 		let vlessHeader = vlessResponseHeader;
@@ -842,7 +842,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
-	---------------------------------------------------------------
+     ---------------------------------------------------------------
 	${vlessMain}
   <p>===============================================================</p>
 	clash-meta
@@ -857,9 +857,9 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-	    path: "/?ed=2048"
-	    headers:
-		  host: ${hostName}
+	  path: "/?ed=2048"
+	  headers:
+	  host: ${hostName}
   <p>===============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla')) {
@@ -867,11 +867,11 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
-	---------------------------------------------------------------
+     ---------------------------------------------------------------
 	https://${hostName}/${userID}
   <p>===============================================================</p>
 	v2ray
-	---------------------------------------------------------------
+     ---------------------------------------------------------------
 	${vlessMain}
   <p>===============================================================</p>
 	clash-meta
@@ -886,13 +886,13 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-		path: "/?ed=2048"
-		headers:
-		  host: ${hostName}
+	  path: "/?ed=2048"
+	  headers:
+	  host: ${hostName}
   <p>===============================================================</p>
 	telegram 交流群 技术大佬~在线发牌!
 	https://t.me/CMLiussss
-	---------------------------------------------------------------
+     ---------------------------------------------------------------
 	github 项目地址 Star!Star!Star!!!
 	https://github.com/JustLagom/EDTUNNEL
   <p>===============================================================</p>
