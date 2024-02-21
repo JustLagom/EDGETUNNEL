@@ -844,10 +844,8 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	v2ray
 	---------------------------------------------------------------
 	${vlessMain}
-	---------------------------------------------------------------
 	################################################################
 	clash-meta
-	---------------------------------------------------------------
 	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
@@ -862,7 +860,6 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	    path: "/?ed=2048"
 	    headers:
 		  host: ${hostName}
-	---------------------------------------------------------------
 	################################################################
 	`;
 	} else if (sub && userAgent.includes('mozilla')) {
@@ -872,15 +869,12 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
 	---------------------------------------------------------------
 	https://${hostName}/${userID}
-	---------------------------------------------------------------
 	################################################################
 	v2ray
 	---------------------------------------------------------------
 	${vlessMain}
-	---------------------------------------------------------------
 	################################################################
 	clash-meta
-	---------------------------------------------------------------
 	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
@@ -895,14 +889,12 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		path: "/?ed=2048"
 		headers:
 		  host: ${hostName}
-	---------------------------------------------------------------
 	################################################################
 	telegram 交流群 技术大佬~在线发牌!
 	https://t.me/CMLiussss
 	---------------------------------------------------------------
 	github 项目地址 Star!Star!Star!!!
-	https://github.com/cmliu/edgetunnel
-	---------------------------------------------------------------
+	https://github.com/JustLagom/EDTUNNEL
 	################################################################
 	`;
 	} else if (sub && userAgent.includes('clash')) {
