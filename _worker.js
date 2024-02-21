@@ -3,13 +3,13 @@ import { connect } from 'cloudflare:sockets';
 
 let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
-let proxyIP = '';// 优选反代IP
+let proxyIP = '';// 反代IP
 
-let sub = 'vless.fxxk.dedyn.io';// 订阅生成器
+let sub = '';// 订阅生成器
 
-let subconverter = 'proxysub.justlagom.workers.dev';// 订阅转换后端
+let subconverter = '';// 订阅转换后端
 
-let subconfig = "https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini";// 订阅配置文件
+let subconfig = "";// 订阅配置文件
 
 let socks5Address = '';// Example:  user:pass@host:port  or  host:port
 
