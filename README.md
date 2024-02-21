@@ -5,13 +5,13 @@
 ------------------------------------------------------------------------
 ## CF vless代码（_worker.js文件）可修改内容及说明:
 
-### 1、UUID必须自定义.
+### 1、UUID须自定义.
 
-### 2、ProxyIP更换，收集来源于网上各位大佬的分享，可自定义.
+### 2、ProxyIP收集来源于网上各位大佬的分享，可自定义.
 
-### 3、伪装网页更新为librespeed.speedtestcustom.com，可自定义.
+### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义.
 
-### 4、快速订阅链接:https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=[你的ws路径].
+### 4、订阅链接:https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=[你的ws路径].
 
 ------------------------------------------------------------------------
 ## 感谢您右上角的star🌟
