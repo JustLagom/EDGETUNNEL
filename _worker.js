@@ -800,118 +800,47 @@ function getVLESSConfig(userIDs, hostName) {
 }
 
 function createVLESSSub(userID_Path, hostName) {
-	// 如果sub为空，则显示原始内容
-	if (!sub || sub === '') {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-  
-		return `
-	################################################################
-	v2ray
-	---------------------------------------------------------------
-	${vlessMain}
-	---------------------------------------------------------------
-	################################################################
-	clash-meta
-	---------------------------------------------------------------
-	- type: vless
-	  name: ${hostName}
-	  server: ${hostName}
-	  port: 443
-	  uuid: ${userID}
-	  network: ws
-	  tls: true
-	  udp: false
-	  sni: ${hostName}
-	  client-fingerprint: chrome
-	  ws-opts:
-	    path: "/?ed=2048"
-	    headers:
-		  host: ${hostName}
-	---------------------------------------------------------------
-	################################################################
-	`;
-	} else if (sub && userAgent.includes('mozilla')) {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-	
-		return `
-	################################################################
-	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
-	---------------------------------------------------------------
-	https://${hostName}/${userID}
-	---------------------------------------------------------------
-	################################################################
-	v2ray
-	---------------------------------------------------------------
-	${vlessMain}
-	---------------------------------------------------------------
-	################################################################
-	clash-meta
-	---------------------------------------------------------------
-	- type: vless
-	  name: ${hostName}
-	  server: ${hostName}
-	  port: 443
-	  uuid: ${userID}
-	  network: ws
-	  tls: true
-	  udp: false
-	  sni: ${hostName}
-	  client-fingerprint: chrome
-	  ws-opts:
-		path: "/?ed=2048"
-		headers:
-		  host: ${hostName}
-	---------------------------------------------------------------
-	################################################################
-	telegram 交流群 技术大佬~在线发牌!
-	https://t.me/CMLiussss
-	---------------------------------------------------------------
-	github 项目地址 Star!Star!Star!!!
-	https://github.com/cmliu/edgetunnel
-	---------------------------------------------------------------
-	################################################################
-	`;
-	} else if (sub && userAgent.includes('clash')) {
-	  // 如果sub不为空且UA为clash，则发起特定请求
-	  	if (typeof fetch === 'function') {
-			try {
-				const response = await fetch(`https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${hostName}%26uuid%3D${userID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`);
-				const content = await response.text();
-				return content;
-			} catch (error) {
-				console.error('Error fetching content:', error);
-				return `Error fetching content: ${error.message}`;
-			}
-	  	} else {
-			return 'Error: fetch is not available in this environment.';//
-	  	}
-	} else if (sub && userAgent.includes('sing-box') || userAgent.includes('singbox')) {
-		// 如果sub不为空且UA为sing-box，则发起特定请求
-		if (typeof fetch === 'function') {
-			try {
-				const response = await fetch(`https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${hostName}%26uuid%3D${userID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`);
-				const content = await response.text();
-				return content;
-			} catch (error) {
-				console.error('获取内容时出错:', error);
-				return `获取内容时出错: ${error.message}`;
-			}
-		} else {
-			return '错误: 在此环境中不支持 fetch。';
+	let portArray_http = [80, 8080, 8880, 2052, 2086, 2095, 2082];
+	let portArray_https = [443, 8443, 2053, 2096, 2087, 2083];
+
+	// Split the userIDs into an array
+	let userIDArray = userID_Path.includes(',') ? userID_Path.split(',') : [userID_Path];
+
+	// Prepare output array
+	let output = [];
+
+	// Generate output string for each userID
+	userIDArray.forEach((userID) => {
+		// Check if the hostName is a Cloudflare Pages domain, if not, generate HTTP configurations
+		// reasons: pages.dev not support http only https
+		if (!hostName.includes('pages.dev')) {
+			// Iterate over all ports for http
+			portArray_http.forEach((port) => {
+				const commonUrlPart_http = `:${port}?encryption=none&security=none&fp=random&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}-HTTP-${port}`;
+				const vlessMainHttp = `vless://${userID}@${hostName}${commonUrlPart_http}`;
+
+				// For each proxy IP, generate a VLESS configuration and add to output
+				proxyIPs.forEach((proxyIP) => {
+					const vlessSecHttp = `vless://${userID}@${proxyIP}${commonUrlPart_http}-${proxyIP}-EDtunnel`;
+					output.push(`${vlessMainHttp}`);
+					output.push(`${vlessSecHttp}`);
+				});
+			});
 		}
-	} else {
-	  	// 如果sub不为空且UA，则发起一般请求
-	  	if (typeof fetch === 'function') {
-			try {
-		  		const response = await fetch(`https://${sub}/sub?host=${hostName}&uuid=${userID}&edgetunnel=cmliu&proxyip=${RproxyIP}`);
-		  		const content = await response.text();
-		  		return content;
-			} catch (error) {
-		  		console.error('Error fetching content:', error);
-		  		return `Error fetching content: ${error.message}`;
-			}
-	  	} else {
-			return 'Error: fetch is not available in this environment.';
-	  	}
-	}
+		// Iterate over all ports for https
+		portArray_https.forEach((port) => {
+			const commonUrlPart_https = `:${port}?encryption=none&security=tls&sni=${hostName}&fp=random&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}-HTTPS-${port}`;
+			const vlessMainHttps = `vless://${userID}@${hostName}${commonUrlPart_https}`;
+
+			// For each proxy IP, generate a VLESS configuration and add to output
+			proxyIPs.forEach((proxyIP) => {
+				const vlessSecHttps = `vless://${userID}@${proxyIP}${commonUrlPart_https}-${proxyIP}-EDtunnel`;
+				output.push(`${vlessMainHttps}`);
+				output.push(`${vlessSecHttps}`);
+			});
+		});
+	});
+
+	// Join output with newlines
+	return output.join('\n');
 }
