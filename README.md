@@ -11,7 +11,7 @@
 
 ### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
 
-### 4、Subscribe / sub 订阅地址：https://[你的Vless域名]/[你的UUID]。
+### 4、Subscribe/sub订阅地址：https://[你的Vless域名]/[你的UUID]。
 
 ### 5、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
 
@@ -23,8 +23,9 @@
 ------------------------------------------------------------------------
 ## 感谢：
 
+### CF-vless代码作者[zizifn](https://github.com/zizifn/edgetunnel)。
 ### CF-vless代码作者[3Kmfi6HP](https://github.com/3Kmfi6HP/EDtunnel)。
-### CF-vless订阅转换作者[cmliu](https://github.com/cmliu/edgetunnel)。
+### CF-vless订阅生成作者[cmliu](https://github.com/cmliu/edgetunnel)。
 ### CF优选IP程序作者[badafans](https://github.com/badafans/Cloudflare-IP-SpeedTest)、[XIU2](https://github.com/XIU2/CloudflareSpeedTest)。
 
 ------------------------------------------------------------------------
