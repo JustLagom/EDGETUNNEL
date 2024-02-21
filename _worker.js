@@ -53,22 +53,43 @@ export default {
 			} else {
 				RproxyIP = env.RPROXYIP || !proxyIP ? 'true' : 'false';
 			}
+			let userID_Path = userID;
+			if (userID.includes(',')) {
+				userID_Path = userID.split(',')[0];
+			}
 			const upgradeHeader = request.headers.get('Upgrade');
-			const url = new URL(request.url);
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
-				// const url = new URL(request.url);
+				const url = new URL(request.url);
 				switch (url.pathname) {
-				case '/':
-					return new Response(JSON.stringify(request.cf), { status: 200 });
-				case `/${userID}`: {
-					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
-					return new Response(`${vlessConfig}`, {
-					status: 200,
-					headers: {
-						"Content-Type": "text/plain;charset=utf-8",
+					case `/cf`: {
+						return new Response(JSON.stringify(request.cf, null, 4), {
+							status: 200,
+							headers: {
+								"Content-Type": "application/json;charset=utf-8",
+							},
+						});
 					}
-					});
-				        }
+					case `/${userID_Path}`: {
+						const vlessConfig = getVLESSConfig(userID, request.headers.get('Host'));
+						return new Response(`${vlessConfig}`, {
+							status: 200,
+							headers: {
+								"Content-Type": "text/html; charset=utf-8",
+							}
+						});
+					};
+					case `/sub/${userID_Path}`: {
+						const url = new URL(request.url);
+						const searchParams = url.searchParams;
+						const vlessSubConfig = createVLESSSub(userID, request.headers.get('Host'));
+						// Construct and return response object
+						return new Response(btoa(vlessSubConfig), {
+							status: 200,
+							headers: {
+								"Content-Type": "text/plain;charset=utf-8",
+							}
+						});
+					};
 					default:
 						// return new Response('Not found', { status: 404 });
 						// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
