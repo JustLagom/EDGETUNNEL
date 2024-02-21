@@ -5,7 +5,7 @@ let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
 let proxyIP = '';// 优选反代IP
 
-let sub = 'sub.cmliussss.workers.dev';// 订阅生成器
+let sub = 'vless.fxxk.dedyn.io';// 订阅生成器
 
 let subconverter = 'proxysub.justlagom.workers.dev';// 订阅转换后端
 
