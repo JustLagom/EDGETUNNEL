@@ -5,7 +5,7 @@ let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
 
 let proxyIP = '';// 优选反代IP
 
-let sub = '';// 订阅生成器
+let sub = 'sub.cmliussss.workers.dev';// 订阅生成器
 
 let subconverter = '';// 订阅转换后端
 
