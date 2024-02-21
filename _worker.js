@@ -684,12 +684,13 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 }
 
 /**
- *
- * @param {string} userID - single or comma separated userIDs
+ * @param {string} userID
  * @param {string | null} hostName
- * @returns {string}
+ * @param {string} sub
+ * @param {string} userAgent
+ * @returns {Promise<string>}
  */
-function getVLESSConfig(userIDs, hostName) {
+async function getVLESSConfig(userID, hostName, sub) {
 	if (!sub || sub === '') {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
   
