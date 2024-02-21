@@ -68,6 +68,15 @@ export default {
 						},
 					});
 				}
+				case `/${userID_Path}`: {
+					const vlessConfig = getVLESSConfig(userID, request.headers.get('Host'));
+					return new Response(`${vlessConfig}`, {
+						status: 200,
+						headers: {
+							"Content-Type": "text/html; charset=utf-8",
+						}
+					});
+				};
 				case '/':
 					return new Response(JSON.stringify(request.cf), { status: 200 });
 				case `/${userID}`: {
