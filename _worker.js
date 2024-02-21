@@ -803,7 +803,6 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-		
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
@@ -829,7 +828,6 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	`;
 	} else if (sub && userAgent.includes('mozilla')) {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-		
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
