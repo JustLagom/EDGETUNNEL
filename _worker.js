@@ -684,10 +684,9 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 }
 
 /**
- * @param {string} userID
+ * @param {string} userID - single or comma separated userIDs
  * @param {string | null} hostName
  * @param {string} sub
- * @param {string} userAgent
  * @returns {Promise<string>}
  */
 async function getVLESSConfig(userID, hostName, sub) {
