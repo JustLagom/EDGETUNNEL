@@ -77,8 +77,6 @@ export default {
 						}
 					});
 				};
-				case '/':
-					return new Response(JSON.stringify(request.cf), { status: 200 });
 				case `/${userID}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 					return new Response(`${vlessConfig}`, {
