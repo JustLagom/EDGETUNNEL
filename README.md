@@ -11,9 +11,9 @@
 
 ### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
 
-### 4、Subscribe/sub订阅地址：https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=/proxyIP=[你的Proxyip]。
+### 4、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
 
-### 5、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
+### 5、订阅地址：https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=/proxyIP=[你的Proxyip]。
 
 ------------------------------------------------------------------------
 </details>
