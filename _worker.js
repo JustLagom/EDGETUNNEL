@@ -1,11 +1,18 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
-let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';
-let proxyIP = '';// path路径自定义
+
+let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';// 自定义变量UUID
+
+let proxyIP = '';// 路径(path)自定义
+
 let sub = '';// 订阅生成器
+
 let subconverter = '';// 订阅转换后端
+
 let subconfig = "";// 订阅配置文件
+
 let socks5Address = '';// 示例：user:pass@host:port  or  host:port
+
 let RproxyIP = 'false';
 
 if (!isValidUUID(userID)) {
@@ -52,10 +59,10 @@ export default {
 				switch (url.pathname) {
 				case `/cf`:{
 					return new Response(JSON.stringify(request.cf, null, 4), {
-						status: 200,
-						headers: {
-							"Content-Type": "application/json;charset=utf-8",
-						},
+					status: 200,
+					headers: {
+						"Content-Type": "application/json;charset=utf-8",
+					}
 					});
 				}
 				case `/${userID}`: {
@@ -68,7 +75,6 @@ export default {
 					});
 				}
 				default:
-					// return new Response('Not found', { status: 404 });
 					// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
 					const DisguiseHostname = 'librespeed.speedtestcustom.com';
 					const newHeaders = new Headers(request.headers);
@@ -94,7 +100,7 @@ export default {
 					}
 					// Return the response from the proxy server
 					return proxyResponse;
-			}
+			        }
 			} else {
 				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.split("=")[1];
 				else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = url.pathname.split("/proxyip.")[1];
@@ -320,9 +326,6 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
 	return stream;
 
 }
-
-// https://xtls.github.io/development/protocols/vless.html
-// https://github.com/zizifn/excalidraw-backup/blob/main/v2ray-protocol.excalidraw
 
 /**
  * 
