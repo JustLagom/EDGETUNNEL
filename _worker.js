@@ -82,7 +82,6 @@ export default {
 					newHeaders.set('x-forwarded-for', '1.2.3.4');
 					newHeaders.set('x-real-ip', '1.2.3.4');
 					newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
-					// Use fetch to proxy the request to 15 different domains
 					const proxyUrl = 'https://' + DisguiseHostname + url.pathname + url.search;
 					let modifiedRequest = new Request(proxyUrl, {
 						method: request.method,
