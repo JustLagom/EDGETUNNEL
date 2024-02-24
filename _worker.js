@@ -13,7 +13,7 @@ let proxyIP = '';// 路径(path)自定义&path=/proxyIP=xxx
 
 let socks5Address = '';// 填写示例：user:pass@host:port  or  host:port
 
-let RproxyIP = 'false';// 若您的订阅由sub.cmliussss.workers.dev提供维护支持, 则可自动获取ProxyIP: true 
+let RproxyIP = '';// 若您的订阅由sub.cmliussss.workers.dev提供维护支持，则可开启自动获取ProxyIP功能，需订阅器支持
 
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
