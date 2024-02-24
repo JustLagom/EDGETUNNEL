@@ -7,7 +7,7 @@
 
 ### 1、UUID须自定义。
 
-### 2、ProxyIP收集来源于网上各位大佬的分享，可自定义。
+### 2、ProxyIP来源于网上各位大佬的分享，可通过path自定义。
 
 ### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
 
@@ -59,6 +59,7 @@
 |--------|---------|-----|
 | UUID | 90cd4a77-141a-43c9-991b-08263cfe9c10 | Powershell -NoExit -Command "[guid]::NewGuid()"|
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
+| RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
 | SUBAPI | api.v1.mk | clash、singbox等 订阅转换后端 |
 | SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | clash、singbox等 订阅转换配置文件 |
 
