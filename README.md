@@ -2,6 +2,8 @@
 
 ### PAGES部署实现VLESS+WS+TLS。
 
+### 基础部署视频教程：https://www.youtube.com/watch?v=LeT4jQUh8ok
+
 ------------------------------------------------------------------------
 ## CF vless代码（_worker.js文件）可修改内容及说明:
 
@@ -11,9 +13,10 @@
 
 ### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
 
-### 4、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
+### 4、订阅地址：https://[YOUR-PAGES-URL]/[YOUR-UUID]，即可获取订阅内容。
 
-### 5、订阅地址：https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=/proxyIP=[你的Proxyip加?ed=2048]。
+### 5、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
+
 
 ------------------------------------------------------------------------
 </details>
@@ -25,15 +28,14 @@
    - 在 `设置构建和部署`页面下方，选择 `环境变量（高级）`后并 `添加变量`
      变量名称填写**UUID**，值则为你的UUID，后点击 `保存并部署`即可。
 
-2. 访问订阅内容：
-   - 访问 `https://[YOUR-PAGES-URL]/[YOUR-UUID]` 即可获取订阅内容。
-   - 订阅地址：https://vless.fxxk.dedyn.io/sub?host=[你的Vless域名]&uuid=[你的UUID]&path=/proxyIP=[你的Proxyip加?ed=2048]。
-
-3. 给 Pages绑定 CNAME自定义域：
+2. 给 Pages绑定 CNAME自定义域：
    - 在 Pages控制台的 `自定义域`选项卡，下方点击 `设置自定义域`。
-   - 填入你的自定义次级域名，注意不要使用你的根域名，例如：
-     您分配到的域名是 `fuck.cloudns.biz`，则添加自定义域填入 `shili.fuck.cloudns.biz`即可；
+   - 填入你的自定义次级域名，注意不要使用你的根域名。例如： 您分配到的域名是 `fuck.cloudns.biz`，则添加自定义域填入 `lizi.fuck.cloudns.biz`即可
    - 按照 Cloudflare 的要求将返回你的域名DNS服务商，添加 该自定义域 `shili`的 CNAME记录 `edgetunnel.pages.dev` 后，点击 `激活域`即可。
+
+3. 给 Pages设定 环境变量：
+   - 在 Pages控制台的 `设置`选项卡，下方点击 `环境变量`。
+   - 填入你的环境变量，注意使用大写，例如：UUID、SOCKS5（若有推荐优先）、RPROXYIP（需订阅器支持）、SUBAPI、SUBCONFIG
 
 4. 使用自己的`优选域名`/`优选IP`的订阅内容(可选)：
    - 当您使用 `let sub = 'sub.cmliussss.workers.dev';` 等非空参数时，您的worker节点配置将通过指定的订阅生成器创建完整的节点订阅信息。这种方式确实便捷，但同时意味着您的节点配置信息将被发送给订阅服务的提供者。
@@ -57,7 +59,7 @@
 ### 变量说明
 | 变量名 | 参考示例 | 备注 | 
 |--------|---------|-----|
-| UUID | 90cd4a77-141a-43c9-991b-08263cfe9c10 | Powershell -NoExit -Command "[guid]::NewGuid()"|
+| UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
 | RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
 | SUBAPI | api.v1.mk | clash、singbox等 订阅转换后端 |
