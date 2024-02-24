@@ -1,7 +1,7 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 
-let userID = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';// 请自定义变量UUID
+let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';// 请自定义变量UUID
 
 let sub = '';// 订阅生成器
 
@@ -11,7 +11,7 @@ let subconverter = '';// 订阅转换后端
 
 let proxyIP = '';// 路径(path)自定义&path=/proxyIP=xxx
 
-let socks5Address = '';// 示例：user:pass@host:port  or  host:port
+let socks5Address = '';// 填写示例：user:pass@host:port  or  host:port
 
 let RproxyIP = 'false';// 若您的订阅由sub.cmliussss.workers.dev提供维护支持, 则可自动获取ProxyIP: true 
 
