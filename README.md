@@ -66,11 +66,6 @@
 | SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | clash、singbox等 订阅转换配置文件 |
 
 ------------------------------------------------------------------------
-## 感谢您右上角的star🌟
-
-[![Stargazers over time](https://starchart.cc/JustLagom/CF-EDTUNNEL.svg?variant=adaptive)](https://starchart.cc/JustLagom/CF-EDTUNNEL)
-
-------------------------------------------------------------------------
 ## 感谢：
 
 ### CF-vless代码作者[zizifn](https://github.com/zizifn/edgetunnel)。
