@@ -15,7 +15,7 @@
 
 ### 4、订阅地址：https://[YOUR-PAGES-URL]/[YOUR-UUID]，即可获取订阅内容。
 
-### 5、支持Base64、clash-meta、sing-box订阅格式, 订阅由vless.fxxk.dedyn.io提供维护支持。
+### 5、支持Base64、clash-meta、sing-box订阅格式, 内置默认订阅器由cmliu大佬提供维护支持。
 
 
 ------------------------------------------------------------------------
@@ -62,8 +62,9 @@
 | UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
 | RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
-| SUBAPI | api.v1.mk | clash、singbox等 订阅转换后端 |
-| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | clash、singbox等 订阅转换配置文件 |
+| SUB | sub.cmliussss.workers.dev | 内置默认 订阅生成器地址 支持RPROXYIP（可自建） |
+| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（可自建） |
+| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（可自定义） |
 
 ------------------------------------------------------------------------
 ## 感谢：
