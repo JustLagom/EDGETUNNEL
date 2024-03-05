@@ -4,6 +4,10 @@
 
 ### 基础部署视频教程：https://www.youtube.com/watch?v=LeT4jQUh8ok
 
+### 快速部署视频教程：https://www.youtube.com/watch?v=Ea3wb5G08l4
+
+### 进阶使用视角教程：https://www.youtube.com/watch?v=s91zjpw3-P8
+
 ------------------------------------------------------------------------
 ## CF vless代码（_worker.js文件）可修改内容及说明:
 
