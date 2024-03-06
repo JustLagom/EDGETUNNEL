@@ -1,27 +1,22 @@
+// <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
-
-let userID = 'bfda82c3-3630-4ca0-8a57-63ce835dd1da';// 请自定义变量UUID
-
-let sub = '';// 订阅生成器
-
-let subconfig = "";// 订阅配置文件
-
-let subconverter = '';// 订阅转换后端
-
-let proxyIP = '';// 路径(path)自定义&path=/proxyIP=xxx
-
-let socks5Address = '';// 填写示例：user:pass@host:port  or  host:port
-
-let RproxyIP = '';// 若您的订阅由sub.cmliussss.workers.dev提供维护支持，则可开启自动获取ProxyIP功能，需订阅器支持
-
+let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
+let proxyIP = '';
+let sub = '';
+let subconverter = '';
+let subconfig = "";
+let socks5Address = '';
+let RproxyIP = '';
+// 通过CF直接设置以上环境变量
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
 }
-
 let parsedSocks5Address = {}; 
 let enableSocks = false;
-
+// 虚假uuid和hostname，用于发送给配置生成服务
+let fakeUserID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+let fakeHostName = "EXAMPLE.COM";
 export default {
 	/**
 	 * @param {import("@cloudflare/workers-types").Request} request
@@ -103,6 +98,7 @@ export default {
 			} else {
 				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.split("=")[1];
 				else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = url.pathname.split("/proxyip.")[1];
+				else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io';
 				return await vlessOverWSHandler(request);
 			}
 		} catch (err) {
@@ -325,6 +321,8 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
 	return stream;
 
 }
+// https://xtls.github.io/development/protocols/vless.html
+// https://github.com/zizifn/excalidraw-backup/blob/main/v2ray-protocol.excalidraw
 
 /**
  * 
@@ -586,7 +584,7 @@ async function handleDNSQuery(udpChunk, webSocket, vlessResponseHeader, log) {
 	// no matter which DNS server client send, we alwasy use hard code one.
 	// beacsue someof DNS server is not support DNS over TCP
 	try {
-		const dnsServer = '8.8.4.4';// change to 1.1.1.1 after cf fix connect own ip bug
+		const dnsServer = '8.8.4.4'; // change to 1.1.1.1 after cf fix connect own ip bug
 		const dnsPort = 53;
 		/** @type {ArrayBuffer | null} */
 		let vlessHeader = vlessResponseHeader;
@@ -796,6 +794,14 @@ function socks5AddressParser(address) {
 	}
 }
 
+function revertFakeInfo(content, userID, hostName, isBase64) {
+	if (isBase64) content = atob(content);//Base64解码
+	content = content.replace(new RegExp(fakeUserID, 'g'), userID).replace(new RegExp(fakeHostName, 'g'), hostName);
+	if (isBase64) content = btoa(content);//Base64编码
+
+	return content;
+}
+
 /**
  * @param {string} userID
  * @param {string | null} hostName
@@ -830,7 +836,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  host: ${hostName}
   <p>===============================================================</p>
 	`;
-        } else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
+	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
 		return `
   <p>==========================配置详解==============================</p>
@@ -860,52 +866,35 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   <p>===============================================================</p>
 	telegram 交流群 技术大佬~在线发牌!
 	https://t.me/CMLiussss
-     ---------------------------------------------------------------
-	github 项目地址 Star!Star!Star!!!
-	https://github.com/JustLagom/EDTUNNEL
   <p>===============================================================</p>
 	`;
-	} else if (sub && userAgent.includes('clash')) {
-	  // 如果sub不为空且UA为clash，则发起特定请求
-	  	if (typeof fetch === 'function') {
-			try {
-				const response = await fetch(`https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${hostName}%26uuid%3D${userID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`);
-				const content = await response.text();
-				return content;
-			} catch (error) {
-				console.error('Error fetching content:', error);
-				return `Error fetching content: ${error.message}`;
-			}
-	  	} else {
-			return 'Error: fetch is not available in this environment.';//
-	  	}
-	} else if (sub && userAgent.includes('sing-box') || userAgent.includes('singbox')) {
-		// 如果sub不为空且UA为sing-box，则发起特定请求
-		if (typeof fetch === 'function') {
-			try {
-				const response = await fetch(`https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${hostName}%26uuid%3D${userID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`);
-				const content = await response.text();
-				return content;
-			} catch (error) {
-				console.error('获取内容时出错:', error);
-				return `获取内容时出错: ${error.message}`;
-			}
-		} else {
-			return '错误: 在此环境中不支持 fetch。';
-		}
 	} else {
-	  	// 如果sub不为空且UA，则发起一般请求
-	  	if (typeof fetch === 'function') {
-			try {
-		  		const response = await fetch(`https://${sub}/sub?host=${hostName}&uuid=${userID}&edgetunnel=cmliu&proxyip=${RproxyIP}`);
-		  		const content = await response.text();
-		  		return content;
-			} catch (error) {
-		  		console.error('Error fetching content:', error);
-		  		return `Error fetching content: ${error.message}`;
-			}
-	  	} else {
+		if (typeof fetch != 'function') {
 			return 'Error: fetch is not available in this environment.';
-	  	}
+		}
+		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
+		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) fakeHostName = "EXAMPLE.workers.dev";
+		let content = "";
+		let url = "";
+		let isBase64 = false;
+		if (userAgent.includes('clash')) {
+			url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`;
+		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
+			url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=false&fdn=false&sort=false&new_name=true`;
+		} else {
+			url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
+			isBase64 = true;
+		}
+		try {
+			const response = await fetch(url ,{
+			headers: {
+				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+			}});
+			content = await response.text();
+			return revertFakeInfo(content, userID, hostName, isBase64);
+		} catch (error) {
+			console.error('Error fetching content:', error);
+			return `Error fetching content: ${error.message}`;
+		}
 	}
 }
