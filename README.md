@@ -1,7 +1,5 @@
 ## Cloudflare-pages代理脚本:
 
-### PAGES部署实现VLESS+WS+TLS。
-
 ### 基础部署视频教程：https://www.youtube.com/watch?v=LeT4jQUh8ok
 
 ### 快速部署视频教程：https://www.youtube.com/watch?v=Ea3wb5G08l4
@@ -9,11 +7,9 @@
 ### 进阶使用视角教程：https://www.youtube.com/watch?v=s91zjpw3-P8
 
 ------------------------------------------------------------------------
-## CF vless代码（_worker.js文件）可修改内容及说明:
+## CF vless代码一键部署后需要设置环境变量:
 
 ### 1、UUID须自定义。
-
-### 2、ProxyIP来源于网上各位大佬的分享，可通过path自定义。
 
 ### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
 
@@ -21,6 +17,17 @@
 
 ### 5、支持Base64、clash-meta、sing-box订阅格式, 内置订阅器由cmliu大佬提供维护支持。
 
+</details>
+
+### 变量说明
+| 变量名 | 参考示例 | 备注 | 
+|--------|---------|-----|
+| UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
+| SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
+| RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
+| SUB | sub.cmliussss.workers.dev | 内置默认 订阅生成器地址 支持RPROXYIP（可自建） |
+| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（可自建） |
+| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（可自定义） |
 
 ------------------------------------------------------------------------
 </details>
@@ -42,8 +49,8 @@
    - 填入你的环境变量，注意使用大写，例如：UUID、SOCKS5（若有推荐优先）、RPROXYIP（需订阅器支持）、SUBAPI、SUBCONFIG
 
 4. 使用自己的`优选域名`/`优选IP`的订阅内容(可选)：
+   - 已通过提交虚假的节点配置给订阅服务，避免节点配置信息泄露。***[#6](https://github.com/cmliu/edgetunnel/pull/6) 感谢 [fatkun](https://github.com/fatkun)***
    - 当您使用 `let sub = 'sub.cmliussss.workers.dev';` 等非空参数时，您的worker节点配置将通过指定的订阅生成器创建完整的节点订阅信息。这种方式确实便捷，但同时意味着您的节点配置信息将被发送给订阅服务的提供者。
-   - 如果您对此存有顾虑，可以通过将 `let sub = '';` 设置为空值，以保持您的edgetunnel节点配置的私密性。但这种方式需要您自行手动选择优选IP或域名，却更能保障你的信息安全；
    - 如果你想使用自己的优选域名或者是自己的优选IP，可以参考 [WorkerVless2sub GitHub 仓库](https://github.com/cmliu/WorkerVless2sub) 中的部署说明自行搭建。
    - 在 Pages控制台的 `设置`选项卡，选择 `环境变量`> `制作`> `编辑变量`> `添加变量`；
    - 变量名设置为`SUB`，对应的值为你部署的订阅生成器地址。例如 `sub.cmliussss.workers.dev`，后点击 **保存**。
@@ -57,18 +64,6 @@
    - 变量名设置为`SUBAPI`，对应的值为你部署的订阅生成器地址。例如 `psub.cmliucdn.workers.dev`，后点击 **保存**。注意不要带https等协议信息和符号。
    - 之后在 Pages控制台的 `部署`选项卡，选择 `所有部署`> `最新部署最右的 ...`> `重试部署`，即可。
    - 注意，如果您使用了反代订阅转换工具，要求订阅转换工具的 `SUBAPI`域名 和 `[YOUR-PAGES-URL]`的域名 不同属一个顶级域名，否则会出现异常。您可以在 `SUBAPI` 变量赋值为 workers.dev 分配到的域名，注意不要带https等协议信息和符号。
-
-</details>
-
-### 变量说明
-| 变量名 | 参考示例 | 备注 | 
-|--------|---------|-----|
-| UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
-| SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
-| RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
-| SUB | sub.cmliussss.workers.dev | 内置默认 订阅生成器地址 支持RPROXYIP（可自建） |
-| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（可自建） |
-| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（可自定义） |
 
 ------------------------------------------------------------------------
 ## 感谢：
