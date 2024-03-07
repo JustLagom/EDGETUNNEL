@@ -797,9 +797,10 @@ function socks5AddressParser(address) {
 function revertFakeInfo(content, userID, hostName, isBase64) {
 	if (isBase64) content = atob(content);//Base64解码
 	content = content.replace(new RegExp(fakeUserID, 'g'), userID).replace(new RegExp(fakeHostName, 'g'), hostName);
-	if (isBase64) content = btoa(content);//Base64编码
-
-	return content;
+        if (isBase64) {
+                content = btoa(content)
+        }
+        return content;
 }
 
 /**
