@@ -8,15 +8,16 @@ let subconverter = '';
 let subconfig = "";
 let socks5Address = '';
 let RproxyIP = '';
-// 通过CF直接设置以上环境变量
+
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
 }
 let parsedSocks5Address = {}; 
 let enableSocks = false;
-// 虚假uuid和hostname，用于发送给配置生成服务
-let fakeUserID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-let fakeHostName = "EXAMPLE.COM";
+
+let fakeUserID = generateUUID();
+let fakeHostName = generateRandomString();
+
 export default {
 	/**
 	 * @param {import("@cloudflare/workers-types").Request} request
@@ -62,10 +63,15 @@ export default {
 				}
 				case `/${userID}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+					const now = Date.now();
+					const timestamp = Math.floor(now / 1000);
+					const today = new Date(now);
+					today.setHours(0, 0, 0, 0);
 					return new Response(`${vlessConfig}`, {
 					status: 200,
 					headers: {
 						"Content-Type": "text/plain;charset=utf-8",
+						"Subscription-Userinfo": `upload=0; download=${Math.floor(((now - today.getTime())/86400000) * 24 * 1099511627776)}; total=${24 * 1099511627776}; expire=${timestamp}`,
 					}
 					});
 				}
@@ -107,6 +113,9 @@ export default {
 		}
 	},
 };
+
+
+
 
 /**
  * 
@@ -321,6 +330,7 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
 	return stream;
 
 }
+
 // https://xtls.github.io/development/protocols/vless.html
 // https://github.com/zizifn/excalidraw-backup/blob/main/v2ray-protocol.excalidraw
 
@@ -441,6 +451,7 @@ function processVlessHeader(
 		isUDP,
 	};
 }
+
 
 /**
  * 
@@ -762,6 +773,7 @@ async function socks5Connect(addressType, addressRemote, portRemote, log) {
 	return socket;
 }
 
+
 /**
  * 
  * @param {string} address
@@ -795,14 +807,42 @@ function socks5AddressParser(address) {
 }
 
 function revertFakeInfo(content, userID, hostName, isBase64) {
-        if (isBase64) {
-                content = atob(content)
-        }
+	if (isBase64) content = atob(content);//Base64解码
 	content = content.replace(new RegExp(fakeUserID, 'g'), userID).replace(new RegExp(fakeHostName, 'g'), hostName);
-        if (isBase64) {
-                content = btoa(content)
-        }
-        return content;
+	if (isBase64) content = btoa(content);//Base64编码
+
+	return content;
+}
+
+function generateRandomNumber() {
+	let minNum = 100000;
+	let maxNum = 999999;
+	return Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+}
+
+function generateRandomString() {
+	let minLength = 2;
+	let maxLength = 3;
+	let length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+	let characters = 'abcdefghijklmnopqrstuvwxyz';
+	let result = '';
+	for (let i = 0; i < length; i++) {
+	  result += characters[Math.floor(Math.random() * characters.length)];
+	}
+	return result;
+}
+
+function generateUUID() {
+	let uuid = '';
+	for (let i = 0; i < 32; i++) {
+	  let num = Math.floor(Math.random() * 16);
+	  if (num < 10) {
+		uuid += num;
+	  } else {
+		uuid += String.fromCharCode(num + 55);
+	  }
+	}
+	return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5').toLowerCase();
 }
 
 /**
@@ -816,6 +856,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
+  
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
@@ -841,6 +882,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
+	
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
@@ -876,7 +918,11 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			return 'Error: fetch is not available in this environment.';
 		}
 		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
-		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) fakeHostName = "EXAMPLE.workers.dev";
+		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")){
+			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
+		} else {
+			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
+		}
 		let content = "";
 		let url = "";
 		let isBase64 = false;
