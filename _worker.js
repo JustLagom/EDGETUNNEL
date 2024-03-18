@@ -942,6 +942,8 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
 		} else if (hostName.includes(".pages.dev")){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
+		} else if (hostName.includes("worker")){
+			fakeHostName = `worker.${fakeHostName}${generateRandomNumber()}.net`;
 		} else {
 			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
 		}
