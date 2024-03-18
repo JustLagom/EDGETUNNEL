@@ -23,11 +23,11 @@
 | 变量名 | 参考示例 | 备注 | 
 |--------|---------|-----|
 | UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
-| SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理 |
-| RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(需订阅器支持) |
-| SUB | sub.cmliussss.workers.dev | 内置默认 订阅生成器地址 支持RPROXYIP（可自建） |
-| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（可自建） |
-| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（可自定义） |
+| SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理(选填) |
+| RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(必填，需订阅器支持) |
+| SUB | vless-4ca.pages.dev | 内置默认 订阅生成器地址 支持RPROXYIP（必填，可自建） |
+| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（必填，可自建） |
+| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（必填，可自定义） |
 
 ------------------------------------------------------------------------
 </details>
@@ -57,7 +57,7 @@
    - 之后在 Pages控制台的 `部署`选项卡，选择 `所有部署`> `最新部署最右的 ...`> `重试部署`，即可。
    - 注意，如果您使用了自己的订阅地址，要求订阅生成器的 `SUB`域名 和 `[YOUR-PAGES-URL]`的域名 不同属一个顶级域名，否则会出现异常。您可以在 `SUB` 变量赋值为 Pages.dev 分配到的域名。
 
-6. 解决转换订阅的隐私问题(可选)：
+5. 解决转换订阅的隐私问题(可选)：
    - 搭建反代订阅转换工具，通过随机化服务器地址和节点账号密码，解决用户转换订阅的隐私问题。
    - 可以参考[不良林psub项目](https://github.com/bulianglin/psub)自行搭建，视频原理以及教程 https://youtu.be/X7CC5jrgazo
    - 在 Pages控制台的 `设置`选项卡，选择 `环境变量`> `制作`> `编辑变量`> `添加变量`；
