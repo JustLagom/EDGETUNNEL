@@ -869,7 +869,7 @@ function generateUUID() {
 async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
   
 		return `
   <p>==========================配置详解==============================</p>
@@ -893,7 +893,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-	  path: "/?ed=2560"
+	  path: "/?ed=2048"
 	  headers:
 	  host: ${hostName}
   <p>===============================================================</p>
@@ -903,7 +903,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   <p>===============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 	
 		return `
   <p>==========================配置详解==============================</p>
@@ -927,7 +927,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-	  path: "/?ed=2560"
+	  path: "/?ed=2048"
 	  headers:
 	  host: ${hostName}
   <p>===============================================================</p>
