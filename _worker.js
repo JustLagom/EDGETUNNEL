@@ -1,6 +1,7 @@
 // <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
+
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
 let proxyIP = '';
 let sub = '';
@@ -12,9 +13,11 @@ let RproxyIP = '';
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
 }
+
 let parsedSocks5Address = {}; 
 let enableSocks = false;
 
+// 虚假uuid和hostname，用于发送给配置生成服务
 let fakeUserID = generateUUID();
 let fakeHostName = generateRandomString();
 
@@ -88,13 +91,13 @@ export default {
 				}
 				default:
 					// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
-					const DisguiseHostname = 'librespeed.speedtestcustom.com';
+					const PrivateHostname = 'librespeed.speedtestcustom.com';
 					const newHeaders = new Headers(request.headers);
 					newHeaders.set('cf-connecting-ip', '1.2.3.4');
 					newHeaders.set('x-forwarded-for', '1.2.3.4');
 					newHeaders.set('x-real-ip', '1.2.3.4');
 					newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
-					const proxyUrl = 'https://' + DisguiseHostname + url.pathname + url.search;
+					const proxyUrl = 'https://' + PrivateHostname + url.pathname + url.search;
 					let modifiedRequest = new Request(proxyUrl, {
 						method: request.method,
 						headers: newHeaders,
@@ -104,7 +107,7 @@ export default {
 					const proxyResponse = await fetch(modifiedRequest, { redirect: 'manual' });
 					// Check for 302 or 301 redirect status and return an error response
 					if ([301, 302].includes(proxyResponse.status)) {
-						return new Response(`Redirects to ${DisguiseHostname} are not allowed.`, {
+						return new Response(`Redirects to ${PrivateHostname} are not allowed.`, {
 							status: 403,
 							statusText: 'Forbidden',
 						});
@@ -866,7 +869,7 @@ function generateUUID() {
 async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
+		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
   
 		return `
   <p>==========================配置详解==============================</p>
@@ -890,7 +893,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-	  path: "/?ed=2048"
+	  path: "/?ed=2560"
 	  headers:
 	  host: ${hostName}
   <p>===============================================================</p>
@@ -900,7 +903,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   <p>===============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
+		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 	
 		return `
   <p>==========================配置详解==============================</p>
@@ -924,7 +927,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  sni: ${hostName}
 	  client-fingerprint: chrome
 	  ws-opts:
-	  path: "/?ed=2048"
+	  path: "/?ed=2560"
 	  headers:
 	  host: ${hostName}
   <p>===============================================================</p>
@@ -961,7 +964,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		try {
 			const response = await fetch(url ,{
 			headers: {
-				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+				'User-Agent': 'chrome'
 			}});
 			content = await response.text();
 			return revertFakeInfo(content, userID, hostName, isBase64);
