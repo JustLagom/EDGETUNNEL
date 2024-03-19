@@ -954,9 +954,9 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		let url = "";
 		let isBase64 = false;
 		if (userAgent.includes('clash')) {
-			url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+			url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
-			url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+			url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 		} else {
 			url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&proxyip=${RproxyIP}`;
 			isBase64 = true;
@@ -964,7 +964,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		try {
 			const response = await fetch(url ,{
 			headers: {
-				'User-Agent': 'chrome'
+				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
 			}});
 			content = await response.text();
 			return revertFakeInfo(content, userID, hostName, isBase64);
