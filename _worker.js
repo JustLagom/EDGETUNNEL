@@ -89,7 +89,6 @@ export default {
 					}
 				}
 				default:
-					// For any other path, reverse proxy to 'website' and return the original response, caching it in the process
 					const PrivateHostname = 'librespeed.speedtestcustom.com';
 					const newHeaders = new Headers(request.headers);
 					newHeaders.set('cf-connecting-ip', '1.2.3.4');
