@@ -1,7 +1,6 @@
 // <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
-
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
 let proxyIP = '';
 let sub = '';
@@ -19,7 +18,7 @@ let enableSocks = false;
 // 虚假uuid和hostname，用于发送给配置生成服务
 let fakeUserID = generateUUID();
 let fakeHostName = generateRandomString();
-
+let tls = true;
 export default {
 	/**
 	 * @param {import("@cloudflare/workers-types").Request} request
@@ -30,13 +29,12 @@ export default {
 	async fetch(request, env, ctx) {
 		try {
 			const userAgent = request.headers.get('User-Agent').toLowerCase();
-			userID = env.UUID || userID;
+			userID = (env.UUID || userID).toLowerCase();
 			proxyIP = env.PROXYIP || proxyIP;
 			socks5Address = env.SOCKS5 || socks5Address;
 			sub = env.SUB || sub;
 			subconverter = env.SUBAPI || subconverter;
 			subconfig = env.SUBCONFIG || subconfig;
-			//RproxyIP = env.RPROXYIP || !proxyIP ? 'true' : 'false';
 			if (socks5Address) {
 				RproxyIP = env.RPROXYIP || 'false';
 				try {
@@ -52,9 +50,10 @@ export default {
 			}
 			const upgradeHeader = request.headers.get('Upgrade');
 			const url = new URL(request.url);
+			if (url.searchParams.has('notls')) tls = false;
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				// const url = new URL(request.url);
-				switch (url.pathname) {
+				switch (url.pathname.toLowerCase()) {
 				case `/cf`:{
 					return new Response(JSON.stringify(request.cf, null, 4), {
 					status: 200,
@@ -67,8 +66,10 @@ export default {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 					const now = Date.now();
 					const timestamp = Math.floor(now / 1000);
+					const expire = 4102329600;//2099-12-31
 					const today = new Date(now);
 					today.setHours(0, 0, 0, 0);
+					const UD = Math.floor(((now - today.getTime())/86400000) * 24 * 1099511627776 / 2);
 					if (userAgent && userAgent.includes('mozilla')){
 						return new Response(`${vlessConfig}`, {
 							status: 200,
@@ -83,7 +84,7 @@ export default {
 								"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
 								"Content-Type": "text/plain;charset=utf-8",
 								"Profile-Update-Interval": "6",
-								"Subscription-Userinfo": `upload=0; download=${Math.floor(((now - today.getTime())/86400000) * 24 * 1099511627776)}; total=${24 * 1099511627776}; expire=${timestamp}`,
+								"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
 							}
 						});
 					}
@@ -871,10 +872,6 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   
 		return `
   <p>==========================配置详解==============================</p>
-	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
-     ---------------------------------------------------------------
-	https://${hostName}/${userID}
-  <p>===============================================================</p>
 	v2ray
      ---------------------------------------------------------------
 	${vlessMain}
@@ -939,8 +936,8 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
 		} else if (hostName.includes(".pages.dev")){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
-		} else if (hostName.includes("worker")){
-			fakeHostName = `worker.${fakeHostName}${generateRandomNumber()}.net`;
+		} else if (hostName.includes("worker") || hostName.includes("notls") || tls == false){
+			fakeHostName = `notls.${fakeHostName}${generateRandomNumber()}.net`;
 		} else {
 			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
 		}
