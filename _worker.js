@@ -99,7 +99,7 @@ export default {
                                         await socket.close();
 
                                         return new Response(new TextDecoder().decode(value), { status: 200 });
-                                    } catch (connectError) {
+                                        } catch (connectError) {
                                         return new Response(connectError.message, { status: 500 });
 				}
 				case `/${userID}`: {
