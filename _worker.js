@@ -61,46 +61,6 @@ export default {
                                             "Content-Type": "application/json;charset=utf-8",
                                         },
                                     });
-                                case '/connect': // for test connect to cf socket
-                                    const [hostname, port] = ['cloudflare.com', '80'];
-                                    console.log(`Connecting to ${hostname}:${port}...`);
-
-                                    try {
-                                        const socket = await connect({
-                                            hostname: hostname,
-                                            port: parseInt(port, 10),
-                                        });
-
-                                        const writer = socket.writable.getWriter();
-
-                                        try {
-                                            await writer.write(new TextEncoder().encode('GET / HTTP/1.1\r\nHost: ' + hostname + '\r\n\r\n'));
-                                        } catch (writeError) {
-                                            writer.releaseLock();
-                                            await socket.close();
-                                            return new Response(writeError.message, { status: 500 });
-                                        }
-
-                                        writer.releaseLock();
-
-                                        const reader = socket.readable.getReader();
-                                        let value;
-
-                                        try {
-                                            const result = await reader.read();
-                                            value = result.value;
-                                        } catch (readError) {
-                                            await reader.releaseLock();
-                                            await socket.close();
-                                            return new Response(readError.message, { status: 500 });
-                                        }
-
-                                        await reader.releaseLock();
-                                        await socket.close();
-
-                                        return new Response(new TextDecoder().decode(value), { status: 200 });
-                                        } catch (connectError) {
-                                        return new Response(connectError.message, { status: 500 });
 				}
 				case `/${userID}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
@@ -131,7 +91,7 @@ export default {
 				}
                                 default:
                                     // return new Response('Not found', { status: 404 });
-                                    // For any other path, reverse proxy to 'maimai.sega.jp' and return the original response
+                                    // For any other path, reverse proxy to 'website' and return the original response
                                     url.hostname = 'librespeed.speedtestcustom.com';
                                     url.protocol = 'https:';
                                     request = new Request(url, request);
@@ -149,8 +109,6 @@ export default {
 		}
 	},
 };
-
-
 
 
 /**
