@@ -110,7 +110,6 @@ export default {
 	},
 };
 
-
 /**
  * 
  * @param {import("@cloudflare/workers-types").Request} request
@@ -446,7 +445,6 @@ function processVlessHeader(
 	};
 }
 
-
 /**
  * 
  * @param {import("@cloudflare/workers-types").Socket} remoteSocket 
@@ -766,7 +764,6 @@ async function socks5Connect(addressType, addressRemote, portRemote, log) {
 	reader.releaseLock();
 	return socket;
 }
-
 
 /**
  * 
