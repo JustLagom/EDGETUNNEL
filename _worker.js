@@ -54,13 +54,13 @@ export default {
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				// const url = new URL(request.url);
 				switch (url.pathname.toLowerCase()) {
-                                case '/cf':
-                                    return new Response(JSON.stringify(request.cf, null, 4), {
-                                        status: 200,
-                                        headers: {
-                                            "Content-Type": "application/json;charset=utf-8",
-                                        },
-                                    });
+				case `/cf`:{
+					return new Response(JSON.stringify(request.cf, null, 4), {
+					status: 200,
+					headers: {
+						"Content-Type": "application/json;charset=utf-8",
+					},
+					});
 				}
 				case `/${userID}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
