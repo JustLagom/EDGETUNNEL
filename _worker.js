@@ -54,13 +54,53 @@ export default {
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				// const url = new URL(request.url);
 				switch (url.pathname.toLowerCase()) {
-				case `/cf`:{
-					return new Response(JSON.stringify(request.cf, null, 4), {
-					status: 200,
-					headers: {
-						"Content-Type": "application/json;charset=utf-8",
-					}
-					});
+                                case '/cf':
+                                    return new Response(JSON.stringify(request.cf, null, 4), {
+                                        status: 200,
+                                        headers: {
+                                            "Content-Type": "application/json;charset=utf-8",
+                                        },
+                                    });
+                                case '/connect': // for test connect to cf socket
+                                    const [hostname, port] = ['cloudflare.com', '80'];
+                                    console.log(`Connecting to ${hostname}:${port}...`);
+
+                                    try {
+                                        const socket = await connect({
+                                            hostname: hostname,
+                                            port: parseInt(port, 10),
+                                        });
+
+                                        const writer = socket.writable.getWriter();
+
+                                        try {
+                                            await writer.write(new TextEncoder().encode('GET / HTTP/1.1\r\nHost: ' + hostname + '\r\n\r\n'));
+                                        } catch (writeError) {
+                                            writer.releaseLock();
+                                            await socket.close();
+                                            return new Response(writeError.message, { status: 500 });
+                                        }
+
+                                        writer.releaseLock();
+
+                                        const reader = socket.readable.getReader();
+                                        let value;
+
+                                        try {
+                                            const result = await reader.read();
+                                            value = result.value;
+                                        } catch (readError) {
+                                            await reader.releaseLock();
+                                            await socket.close();
+                                            return new Response(readError.message, { status: 500 });
+                                        }
+
+                                        await reader.releaseLock();
+                                        await socket.close();
+
+                                        return new Response(new TextDecoder().decode(value), { status: 200 });
+                                    } catch (connectError) {
+                                        return new Response(connectError.message, { status: 500 });
 				}
 				case `/${userID}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
@@ -89,31 +129,14 @@ export default {
 						});
 					}
 				}
-				default:
-					const PrivateHostname = 'librespeed.speedtestcustom.com';
-					const newHeaders = new Headers(request.headers);
-					newHeaders.set('cf-connecting-ip', '1.2.3.4');
-					newHeaders.set('x-forwarded-for', '1.2.3.4');
-					newHeaders.set('x-real-ip', '1.2.3.4');
-					newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
-					const proxyUrl = 'https://' + PrivateHostname + url.pathname + url.search;
-					let modifiedRequest = new Request(proxyUrl, {
-						method: request.method,
-						headers: newHeaders,
-						body: request.body,
-						redirect: 'manual',
-					});
-					const proxyResponse = await fetch(modifiedRequest, { redirect: 'manual' });
-					// Check for 302 or 301 redirect status and return an error response
-					if ([301, 302].includes(proxyResponse.status)) {
-						return new Response(`Redirects to ${PrivateHostname} are not allowed.`, {
-							status: 403,
-							statusText: 'Forbidden',
-						});
-					}
-					// Return the response from the proxy server
-					return proxyResponse;
-			        }
+                                default:
+                                    // return new Response('Not found', { status: 404 });
+                                    // For any other path, reverse proxy to 'maimai.sega.jp' and return the original response
+                                    url.hostname = 'librespeed.speedtestcustom.com';
+                                    url.protocol = 'https:';
+                                    request = new Request(url, request);
+                                    return await fetch(request);
+				}
 			} else {
 				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.split("=")[1];
 				else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = url.pathname.split("/proxyip.")[1];
