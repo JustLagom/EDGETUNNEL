@@ -5,7 +5,7 @@ import { connect } from 'cloudflare:sockets';
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
 let proxyIP = '';
 let sub = '';
-let subconverter = '';
+let subconverter = "";
 let subconfig = "";
 let socks5Address = '';
 let RproxyIP = '';
