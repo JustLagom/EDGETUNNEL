@@ -1,6 +1,7 @@
 // <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
+
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
 let proxyIP = '';
 let sub = '';
@@ -8,6 +9,8 @@ let subconverter = '';
 let subconfig = "";
 let socks5Address = '';
 let RproxyIP = '';
+let proxydomain = '';
+
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
 }
@@ -32,6 +35,7 @@ export default {
 			userID = (env.UUID || userID).toLowerCase();
 			proxyIP = env.PROXYIP || proxyIP;
 			socks5Address = env.SOCKS5 || socks5Address;
+			proxydomain = env.PROXYDOMAIN || proxydomain;
 			sub = env.SUB || sub;
 			subconverter = env.SUBAPI || subconverter;
 			subconfig = env.SUBCONFIG || subconfig;
@@ -59,7 +63,7 @@ export default {
 					status: 200,
 					headers: {
 						"Content-Type": "application/json;charset=utf-8",
-					},
+					}
 					});
 				}
 				case `/${userID}`: {
@@ -89,10 +93,8 @@ export default {
 						});
 					}
 				}
-                                default:
-                                    // return new Response('Not found', { status: 404 });
-                                    // For any other path, reverse proxy to 'website' and return the original response
-                                    url.hostname = 'librespeed.speedtestcustom.com';
+				default:
+                                    url.hostname = proxydomain;
                                     url.protocol = 'https:';
                                     request = new Request(url, request);
                                     return await fetch(request);
