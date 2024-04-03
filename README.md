@@ -11,7 +11,7 @@
 
 ### 1、UUID须自定义。
 
-### 3、伪装网页设置为librespeed.speedtestcustom.com，可自定义。
+### 3、伪装域名由变量PROXYDOMAIN设置，可自定义。
 
 ### 4、订阅地址：https://[YOUR-PAGES-URL]/[YOUR-UUID]，即可获取订阅内容。
 
@@ -24,6 +24,7 @@
 |--------|---------|-----|
 | UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理(选填) |
+| PROXYDOMAIN  | www.bing.com | 作为反代伪装域名可自定义(选填) |
 | RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(必填，需订阅器支持) |
 | SUB | vless-4ca.pages.dev | 内置默认 订阅生成器地址 支持RPROXYIP（必填，可自建） |
 | SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（必填，可自建） |
