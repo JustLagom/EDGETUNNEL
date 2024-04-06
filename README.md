@@ -26,9 +26,10 @@
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理(选填) |
 | PROXYDOMAIN  | www.bing.com | 作为反代伪装域名可自定义(选填) |
 | RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(必填，需订阅器支持) |
-| SUB | vless-4ca.pages.dev | 内置默认 订阅生成器地址 支持RPROXYIP（必填，可自建） |
-| SUBAPI | api.v1.mk | 内置默认 肥羊clash、singbox等 订阅转换后端（必填，可自建） |
-| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | 内置默认 clash、singbox等 订阅转换配置文件（必填，可自定义） |
+| PROXYIP | proxyip.fxxk.dedyn.io | 当RPROXYIP设为 false 才可启用(选填，支持多ProxyIP使用,作间隔)) |
+| SUB | vless-4ca.pages.dev | 订阅生成器地址 支持RPROXYIP（必填，可自建） |
+| SUBAPI | apiurl.v1.mk | 肥羊clash、singbox等 订阅转换后端（必填，可自建） |
+| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | clash、singbox等 订阅转换配置文件（必填，可自定义） |
 
 ------------------------------------------------------------------------
 </details>
