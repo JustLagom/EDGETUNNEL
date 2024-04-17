@@ -879,7 +879,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	clash-meta
 	---------------------------------------------------------------
 	- type: vless
-	  name: EDGETUNNEL
+	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
 	  uuid: ${userID}
@@ -910,7 +910,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	clash-meta
 	---------------------------------------------------------------
 	- type: vless
-	  name: EDGETUNNEL
+	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
 	  uuid: ${userID}
