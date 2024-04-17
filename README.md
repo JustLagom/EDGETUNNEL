@@ -13,7 +13,7 @@
 
 ### 3、伪装域名由变量PROXYDOMAIN设置，可自定义。
 
-### 4、订阅地址：https://[YOUR-PAGES-URL]/[YOUR-UUID]，即可获取订阅内容。
+### 4、订阅地址：https://[YOUR-域名]/[YOUR-TOKEN]，即可获取订阅内容。
 
 ### 5、支持Base64、clash-meta、sing-box订阅格式, 内置订阅器由cmliu大佬提供维护支持。
 
@@ -24,12 +24,13 @@
 |--------|---------|-----|
 | UUID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx | Powershell -NoExit -Command "[guid]::NewGuid()"|
 | SOCKS5  | user:password@127.0.0.1:1080 | 优先作为访问CloudFlareCDN站点的SOCKS5代理(选填) |
-| PROXYDOMAIN  | www.bing.com | 作为反代伪装域名可自定义(选填) |
+| TOKEN  | vless | 使用域名/token方式启用订阅链接页面(必填，可自定义) |
+| PROXYDOMAIN  | www.bing.com | 作为反代伪装域名可自定义(选填，可自定义) |
 | RPROXYIP | true | 设为 true 即可强制获取订阅器分配的ProxyIP(必填，需订阅器支持) |
 | PROXYIP | proxyip.fxxk.dedyn.io | 当RPROXYIP设为 false 才可启用(选填，支持多ProxyIP使用,作间隔)) |
 | SUB | vless-4ca.pages.dev | 订阅生成器地址 支持RPROXYIP（必填，可自建） |
 | SUBAPI | apiurl.v1.mk | 肥羊clash、singbox等 订阅转换后端（必填，可自建） |
-| SUBCONFIG | [https://raw.github.../ACL4SSR_Online_Full_MultiMode.ini](https://raw.githubusercontent.com/cmliu/edgetunnel/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini) | clash、singbox等 订阅转换配置文件（必填，可自定义） |
+| SUBCONFIG | https://raw.githubusercontent.com/cmliu/ACL4SSR/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini | clash、singbox等 订阅转换配置文件（必填，可自定义） |
 
 ------------------------------------------------------------------------
 </details>
@@ -38,8 +39,7 @@
 1. 部署 Cloudflare Pages：
    - 在 Github 上先 Fork 本项目，并点上 Star !!!
    - 在 Cloudflare Pages 控制台中选择 `连接到 Git`后，选中 `edgetunnel`项目后点击 `开始设置`。
-   - 在 `设置构建和部署`页面下方，选择 `环境变量（高级）`后并 `添加变量`
-     变量名称填写**UUID**，值则为你的UUID，后点击 `保存并部署`即可。
+   - 在 `设置构建和部署`页面下方，选择 `环境变量（高级）`后并 `添加变量`后点击 `保存并重新部署`即可。
 
 2. 给 Pages绑定 CNAME自定义域：
    - 在 Pages控制台的 `自定义域`选项卡，下方点击 `设置自定义域`。
