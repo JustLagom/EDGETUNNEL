@@ -22,15 +22,15 @@
 ### 变量说明
 | 变量名(备注) | 参考示例 | 
 |--------|---------|
-| UUID(Powershell -NoExit -Command "[guid]::NewGuid()") | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
-| SOCKS5(优先作为访问CloudFlareCDN站点的SOCKS5代理(选填)) | user:password@127.0.0.1:1080 |
-| TOKEN(使用域名/token方式启用订阅链接页面(必填，可自定义)) | vless |
-| PROXYDOMAIN(作为反代伪装域名可自定义(选填，可自定义)) | www.bing.com |
-| RPROXYIP(设为 true 即可强制获取订阅器分配的ProxyIP(必填，需订阅器支持)) | true |
-| PROXYIP(当RPROXYIP设为 false 才可启用(选填，支持多ProxyIP使用,作间隔)) | proxyip.fxxk.dedyn.io |
-| SUB(订阅生成器地址 支持RPROXYIP（必填，可自建）) | vless-4ca.pages.dev |
-| SUBAPI(肥羊clash、singbox等 订阅转换后端（必填，可自建）) | apiurl.v1.mk |
-| SUBCONFIG(clash、singbox等 订阅转换配置文件（必填，可自定义）) | https://raw.githubusercontent.com/cmliu/ACL4SSR/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini |
+| UUID（必填）| xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
+| SOCKS5（选填）| user:password@127.0.0.1:1080 |
+| TOKEN（必填，可自定义）| vless |
+| PROXYDOMAIN（必填，可自定义）| www.bing.com |
+| RPROXYIP（必填，需订阅器支持）| true |
+| PROXYIP（选填，支持多ProxyIP使用,作间隔）| proxyip.fxxk.dedyn.io |
+| SUB（必填，可自建）| vless-4ca.pages.dev |
+| SUBAPI（必填，可自建）| apiurl.v1.mk |
+| SUBCONFIG（必填，可自定义）| https://raw.githubusercontent.com/cmliu/ACL4SSR/main/Clash/config/ACL4SSR_Online_Full_MultiMode.ini |
 
 ------------------------------------------------------------------------
 </details>
