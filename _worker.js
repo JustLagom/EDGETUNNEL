@@ -75,7 +75,7 @@ export default {
 					});
 				}
 				case `/${token}`: {
-					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+					const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 					const now = Date.now();
 					const timestamp = Math.floor(now / 1000);
 					const expire = 4102329600;//2099-12-31
@@ -857,13 +857,14 @@ async function ADD(envadd) {
 }
 
 /**
+ * @param {string} token
  * @param {string} userID
  * @param {string | null} hostName
  * @param {string} sub
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
-async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
+async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
 		const vlessMain = `vless://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
@@ -899,7 +900,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
 	---------------------------------------------------------------
-	https://${hostName}/${userID}
+	https://${hostName}/${token}
   <p>==============================================================</p>
 	v2ray
 	---------------------------------------------------------------
