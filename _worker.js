@@ -3,6 +3,7 @@
 import { connect } from 'cloudflare:sockets';
 
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
+let token= '';
 let proxyIP = '';
 let sub = '';
 let subconverter = "";
@@ -33,6 +34,7 @@ export default {
 		try {
 			const userAgent = request.headers.get('User-Agent').toLowerCase();
 			userID = (env.UUID || userID).toLowerCase();
+			token = env.TOKEN || token;
 			proxyIP = env.PROXYIP || proxyIP;
 			const proxyIPs = await ADD(proxyIP);
 			proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
@@ -72,7 +74,7 @@ export default {
 					}
 					});
 				}
-				case `/${userID}`: {
+				case `/${token}`: {
 					const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 					const now = Date.now();
 					const timestamp = Math.floor(now / 1000);
@@ -861,19 +863,24 @@ async function ADD(envadd) {
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
+let vv = 'v';
+let ll = 'l';
+let ee = 'e';
+let ss = 's';
 async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const cmliuMain = `${vv}${ll}${ee}${ss}${ss}://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
   
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
-     ---------------------------------------------------------------
-	${vlessMain}
-  <p>===============================================================</p>
+	---------------------------------------------------------------
+	${cmliuMain}
+  <p>==============================================================</p>
 	clash-meta
-	- type: vless
+	---------------------------------------------------------------
+	- type: ${vv}${ll}${ee}${ss}${ss}
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
@@ -886,24 +893,25 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  ws-opts:
 	  path: "/?ed=2560"
 	  headers:
-	  host: ${hostName}
-  <p>===============================================================</p>
+          host: ${hostName}
+  <p>==============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const cmliuMain = `${vv}${ll}${ee}${ss}${ss}://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 	
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
-     ---------------------------------------------------------------
+	---------------------------------------------------------------
 	https://${hostName}/${userID}
-  <p>===============================================================</p>
+  <p>==============================================================</p>
 	v2ray
-     ---------------------------------------------------------------
-	${vlessMain}
-  <p>===============================================================</p>
+	---------------------------------------------------------------
+	${cmliuMain}
+  <p>==============================================================</p>
 	clash-meta
-	- type: vless
+	---------------------------------------------------------------
+	- type: ${vv}${ll}${ee}${ss}${ss}
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
@@ -917,11 +925,11 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  path: "/?ed=2560"
 	  headers:
 	  host: ${hostName}
-  <p>===============================================================</p>
-	github 项目 Star!Star!Star!!!
+  <p>==============================================================</p>
+	github 项目地址 Star!Star!Star!!!
 	telegram 交流群 技术大佬~在线发牌!
 	https://t.me/CMLiussss
-  <p>===============================================================</p>
+  <p>==============================================================</p>
 	`;
 	} else {
 		if (typeof fetch != 'function') {
