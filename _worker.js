@@ -864,10 +864,11 @@ async function ADD(envadd) {
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
+let type = 'vless';
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const proxynode = `vless://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 
 		return `
   <p>==========================配置详解==============================</p>
@@ -894,7 +895,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
   <p>==============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const proxynode = `vless://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 
 		return `
   <p>==========================配置详解==============================</p>
