@@ -4,13 +4,13 @@ import { connect } from 'cloudflare:sockets';
 
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10';
 let token= '';
-let proxyIP = '';
+let RproxyIP = '';
+let proxydomain = '';
 let sub = '';
 let subconverter = "";
 let subconfig = "";
 let socks5Address = '';
-let RproxyIP = '';
-let proxydomain = '';
+let proxyIP = '';
 
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
@@ -102,10 +102,10 @@ export default {
 					}
 				}
 				default:
-                                    url.hostname = proxydomain;
-                                    url.protocol = 'https:';
-                                    request = new Request(url, request);
-                                    return await fetch(request);
+					url.hostname = proxydomain;
+					url.protocol = 'https:';
+					request = new Request(url, request);
+					return await fetch(request);
 				}
 			} else {
 				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.split("=")[1];
@@ -863,24 +863,20 @@ async function ADD(envadd) {
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
-let vv = 'v';
-let ll = 'l';
-let ee = 'e';
-let ss = 's';
 async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const cmliuMain = `${vv}${ll}${ee}${ss}${ss}://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
-  
+		const vlessMain = `vless://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
 	---------------------------------------------------------------
-	${cmliuMain}
+	${vlessMain}
   <p>==============================================================</p>
 	clash-meta
 	---------------------------------------------------------------
-	- type: ${vv}${ll}${ee}${ss}${ss}
+	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
@@ -893,12 +889,12 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	  ws-opts:
 	  path: "/?ed=2560"
 	  headers:
-          host: ${hostName}
+	  host: ${hostName}
   <p>==============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const cmliuMain = `${vv}${ll}${ee}${ss}${ss}://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
-	
+		const vlessMain = `vless://${userID}\u0040${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
@@ -907,11 +903,11 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
   <p>==============================================================</p>
 	v2ray
 	---------------------------------------------------------------
-	${cmliuMain}
+	${vlessMain}
   <p>==============================================================</p>
 	clash-meta
 	---------------------------------------------------------------
-	- type: ${vv}${ll}${ee}${ss}${ss}
+	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: 443
