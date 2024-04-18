@@ -867,11 +867,10 @@ async function ADD(envadd) {
 let type = 'vless://';
 let port = '443';
 let network = 'ws';
-let client-fingerprint = 'chrome';
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
-		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${client-fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 
 		return `
   <p>==========================配置详解==============================</p>
@@ -890,7 +889,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	  tls: true
 	  udp: false
 	  sni: ${hostName}
-	  client-fingerprint: ${client-fingerprint}
+	  client-fingerprint: chrome
 	  ws-opts:
 	  path: "/?ed=2560"
 	  headers:
@@ -898,7 +897,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
   <p>==============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${client-fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 
 		return `
   <p>==========================配置详解==============================</p>
@@ -921,7 +920,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	  tls: true
 	  udp: false
 	  sni: ${hostName}
-	  client-fingerprint: ${client-fingerprint}
+	  client-fingerprint: chrome
 	  ws-opts:
 	  path: "/?ed=2560"
 	  headers:
