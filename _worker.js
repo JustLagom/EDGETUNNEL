@@ -1,4 +1,4 @@
-// <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
+// <!--GAMFC-->version base on commit 841ed4e9ff121dde0ed6a56ae800c2e6c4f66056, time is 2024-04-16 18:02:38 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 
@@ -18,6 +18,7 @@ if (!isValidUUID(userID)) {
 
 let parsedSocks5Address = {}; 
 let enableSocks = false;
+
 let fakeUserID = generateUUID();
 let fakeHostName = generateRandomString();
 let tls = true;
@@ -25,7 +26,7 @@ let tls = true;
 export default {
 	/**
 	 * @param {import("@cloudflare/workers-types").Request} request
-	 * @param {{UUID: string, PROXYIP: string}} env
+	 * @param {{UUID: string, TOKEN: string, PROXYIP: string, RPROXYIP: string, SOCKS5: string, PROXYDOMAIN: string, SUB: string, SUBAPI: string, SUBCONFIG: string}} env
 	 * @param {import("@cloudflare/workers-types").ExecutionContext} ctx
 	 * @returns {Promise<Response>}
 	 */
@@ -326,9 +327,6 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
 	return stream;
 
 }
-
-// https://xtls.github.io/development/protocols/vless.html
-// https://github.com/zizifn/excalidraw-backup/blob/main/v2ray-protocol.excalidraw
 
 /**
  * 
@@ -852,10 +850,8 @@ let port = '443';
 let network = 'ws';
 let fingerprint = 'chrome';
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
-	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
 		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
-
 		return `
   <p>==========================配置详解==============================</p>
 	v2ray
@@ -882,7 +878,6 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
 		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
-
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
