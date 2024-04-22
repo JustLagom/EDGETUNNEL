@@ -843,6 +843,7 @@ function generateUUID() {
  * @param {string | null} hostName
  * @param {string} sub
  * @param {string} userAgent
+ * @param {string} RproxyIP
  * @returns {Promise<string>}
  */
 let type = 'vless://';
@@ -854,12 +855,8 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 		return `
   <p>==========================配置详解==============================</p>
-	v2ray
-	---------------------------------------------------------------
-	${proxynode}
+	节点配置：${proxynode}
   <p>==============================================================</p>
-	clash-meta
-	---------------------------------------------------------------
 	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
@@ -882,14 +879,8 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
 	---------------------------------------------------------------
-	https://${hostName}/${token}
+	订阅地址：https://${hostName}/${token}
   <p>==============================================================</p>
-	v2ray
-	---------------------------------------------------------------
-	${proxynode}
-  <p>==============================================================</p>
-	clash-meta
-	---------------------------------------------------------------
 	- type: vless
 	  name: ${hostName}
 	  server: ${hostName}
@@ -906,8 +897,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 	  host: ${hostName}
   <p>==============================================================</p>
 	github 项目地址 Star!Star!Star!!!
-	telegram 交流群 技术大佬~在线发牌!
-	https://t.me/CMLiussss
+	telegram 交流群 https://t.me/CMLiussss
   <p>==============================================================</p>
 	`;
 	} else {
