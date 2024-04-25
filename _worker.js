@@ -846,18 +846,18 @@ function generateUUID() {
  * @param {string} RproxyIP
  * @returns {Promise<string>}
  */
-let type = 'vless://';
+let type = 'vless';
 let port = '443';
 let network = 'ws';
 let fingerprint = 'chrome';
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
 	if (!sub || sub === '') {
-		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}://${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 		return `
   <p>==========================配置详解==============================</p>
 	节点配置：${proxynode}
   <p>==============================================================</p>
-	- type: vless
+	- type: ${type}
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: ${port}
@@ -874,14 +874,14 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
   <p>==============================================================</p>
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
-		const proxynode = `${type}${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
+		const proxynode = `${type}://${userID}@${hostName}:${port}?encryption=none&security=tls&sni=${hostName}&fp=${fingerprint}&type=${network}&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
 		return `
   <p>==========================配置详解==============================</p>
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
 	---------------------------------------------------------------
 	订阅地址：https://${hostName}/${token}
   <p>==============================================================</p>
-	- type: vless
+	- type: ${type}
 	  name: ${hostName}
 	  server: ${hostName}
 	  port: ${port}
