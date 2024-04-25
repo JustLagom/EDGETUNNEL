@@ -7,8 +7,8 @@ let token= '';
 let RproxyIP = '';
 let proxydomain = '';
 let sub = '';
-let subconverter = "";
-let subconfig = "";
+let subconverter = '';
+let subconfig = '';
 let socks5Address = '';
 let proxyIP = '';
 
@@ -905,17 +905,17 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 			return 'Error: fetch is not available in this environment.';
 		}
 		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
-		if (hostName.includes(".workers.dev")){
+		if (hostName.includes('workers.dev')){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
-		} else if (hostName.includes(".pages.dev")){
+		} else if (hostName.includes('pages.dev')){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
-		} else if (hostName.includes("worker") || hostName.includes("notls") || tls == false){
+		} else if (hostName.includes('workers.dev') || hostName.includes("notls") || tls == false){
 			fakeHostName = `notls.${fakeHostName}${generateRandomNumber()}.net`;
 		} else {
 			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
 		}
-		let content = "";
-		let url = "";
+		let content = '';
+		let url = '';
 		let isBase64 = false;
 		if (userAgent.includes('clash') && !userAgent.includes('nekobox')) {
 			url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
