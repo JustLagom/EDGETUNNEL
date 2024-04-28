@@ -589,8 +589,8 @@ async function handleDNSQuery(udpChunk, webSocket, vlessResponseHeader, log) {
 	// no matter which DNS server client send, we alwasy use hard code one.
 	// beacsue someof DNS server is not support DNS over TCP
 	try {
-		const dnsServer = '8.8.8.8'; // change to 1.1.1.1 after cf fix connect own ip bug
-		const dnsPort = 53;
+		const dnsServer = 'dns.google'; // change to 1.1.1.1 after cf fix connect own ip bug
+		const dnsPort = 853;
 		/** @type {ArrayBuffer | null} */
 		let vlessHeader = vlessResponseHeader;
 		/** @type {import("@cloudflare/workers-types").Socket} */
