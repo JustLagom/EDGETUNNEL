@@ -80,7 +80,7 @@ export default {
 						return new Response(`${vlessConfig}`, {
 							status: 200,
 							headers: {
-								"Content-Type": "text/plain;charset=utf-8",
+								"Content-Type": "text/html;charset=utf-8",
 							}
 						});
 					} else {
@@ -838,49 +838,6 @@ function generateUUID() {
 	return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5').toLowerCase();
 }
 
-function 配置信息(UUID, 域名地址) {
-	const Base64字符串 = 'dmxlc3M=';
-	const 协议类型 = atob(Base64字符串);
-	
-	const 别名 = 域名地址;
-	let 地址 = 域名地址;
-	let 端口 = 443;
-
-	const 用户ID = UUID;
-	const 加密方式 = 'none';
-	
-	const 传输层协议 = 'ws';
-	const 伪装域名 = 域名地址;
-	const 路径 = '/?ed=2560';
-	
-	let 传输层安全 = ['tls',true];
-	const SNI = 域名地址;
-	const 指纹 = 'chrome';
-
-	if (域名地址.includes('.workers.dev')){
-		地址 = 'www.wto.org';
-		端口 = 80 ;
-		传输层安全 = ['',false];
-	}
-
-	const v2ray = `${协议类型}://${用户ID}@${地址}:${端口}?encryption=${加密方式}&security=${传输层安全[0]}&sni=${SNI}&fp=${指纹}&type=${传输层协议}&host=${伪装域名}&path=${encodeURIComponent(路径)}#${encodeURIComponent(别名)}`;
-	const clash = `- type: ${协议类型}
-	name: ${别名}
-	server: ${地址}
-	port: ${端口}
-	uuid: ${用户ID}
-	network: ${传输层协议}
-	tls: ${传输层安全[1]}
-	udp: false
-	sni: ${SNI}
-	client-fingerprint: ${指纹}
-	ws-opts:
-	  path: "${路径}"
-	  headers:
-	  host: ${伪装域名}`;
-	return [v2ray,clash];
-}
-
 /**
  * @param {string} token
  * @param {string} userID
@@ -890,34 +847,35 @@ function 配置信息(UUID, 域名地址) {
  * @returns {Promise<string>}
  */
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
-	const Config = 配置信息(userID , hostName);
-	const v2ray = Config[0];
-	const clash = Config[1];
-	// 如果sub为空，则显示原始内容
-	if (!sub || sub === '') {		
+	if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
 		return `
-  <p>==============================================================</p>
-	${v2ray}
-  <p>==============================================================</p>
-	${clash}
-  <p>==============================================================</p>
-	`;
-	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {	
-		return `
-  <p>==============================================================</p>
-	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
-	---------------------------------------------------------------
-	订阅地址：https://${hostName}/${token}
-  <p>==============================================================</p>
-	${v2ray}
-  <p>==============================================================</p>
-	${clash}
-  <p>==============================================================</p>
-	github 项目地址 Star!Star!Star!!!
-	telegram 交流群 https://t.me/CMLiussss
-  <p>==============================================================</p>
-	`;
-	} else {
+		<!DOCTYPE html>
+		<html>
+		<head>
+		<title>Welcome to nginx!</title>
+		<style>
+			body {
+				width: 35em;
+				margin: 0 auto;
+				font-family: Tahoma, Verdana, Arial, sans-serif;
+			}
+		</style>
+		</head>
+		<body>
+		<h1>Welcome to nginx!</h1>
+		<p>If you see this page, the nginx web server is successfully installed and
+		working. Further configuration is required.</p>
+		
+		<p>For online documentation and support please refer to
+		<a href="http://nginx.org/">nginx.org</a>.<br/>
+		Commercial support is available at
+		<a href="http://nginx.com/">nginx.com</a>.</p>
+		
+		<p><em>Thank you for using nginx.</em></p>
+		</body>
+		</html>
+		`;
+	}else {
 		if (typeof fetch != 'function') {
 			return 'Error: fetch is not available in this environment.';
 		}
