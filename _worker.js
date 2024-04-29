@@ -608,7 +608,7 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
       new WritableStream({
         /**@param {ArrayBuffer} chunk  */
         async write(chunk) {
-          const res = await fetch('https://1.1.1.1/dns-query', {
+          const res = await fetch('https://dns.google/dns-query', {
             method: 'POST',
             headers: { 'content-type': 'application/dns-message' },
             body: chunk
