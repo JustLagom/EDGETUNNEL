@@ -1,19 +1,19 @@
 // <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
-// @ts-ignore
+//@ts-ignore
 import { connect } from 'cloudflare:sockets'
-//以下变量使用cloudflare项目内变量自行设置
+//以下变量使用cloudflare项目内变量自行设置仅供参考
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10'
-let token= ''
-let RproxyIP = ''
-let proxydomain = ''
-let sub = ''
-let subconverter = ''
-let subconfig = ''
+let token= 'vless'
+let RproxyIP = 'true'
+let proxydomain = 'www.bing.com'
+let sub = 'vless-4ca.pages.dev'
+let subconverter = 'apiurl.v1.mk'
+let subconfig = 'https://raw.githubusercontent.com/JustLagom/test/main/urltestconfig.ini'
 let socks5Address = ''
 let proxyIP = ''
 
 if (!isValidUUID(userID)) {
-	throw new Error('uuid is not valid');
+  throw new Error('uuid is not valid')
 }
 
 let parsedSocks5Address = {}
@@ -22,15 +22,12 @@ let enableSocks = false
 let fakeUserID = generateUUID()
 let fakeHostName = generateRandomString()
 let tls = true
-
 export default {
-	/**
-	 * @param {import("@cloudflare/workers-types").Request} request
-	 * @param {{UUID: string, TOKEN: string, PROXYIP: string, RPROXYIP: string, SOCKS5: string, PROXYDOMAIN: string, SUB: string, SUBAPI: string, SUBCONFIG: string}} env
-	 * @param {import("@cloudflare/workers-types").ExecutionContext} ctx
-	 * @returns {Promise<Response>}
-	 */
-  async fetch(request, env, ctx) {
+  /**
+   * @param {{UUID, TOKEN, SOCKS5, PROXYIP, RPROXYIP, SUB, SUBAPI, SUBCONFIG, PROXYDOMAIN: string}} env
+   * @returns {Promise<Response>}
+   */
+  async fetch(request, env, _ctx) {
     try {
       const userAgent = request.headers.get('User-Agent').toLowerCase()
       userID = (env.UUID || userID).toLowerCase()
@@ -54,27 +51,29 @@ export default {
       } else {
         RproxyIP = env.RPROXYIP || !proxyIP ? 'true' : 'false'
       }
-       const upgradeHeader = request.headers.get('Upgrade')
-       const url = new URL(request.url)
-       if (url.searchParams.has('notls')) tls = false
-       if (!upgradeHeader || upgradeHeader !== 'websocket') {
+      const upgradeHeader = request.headers.get('Upgrade')
+      const url = new URL(request.url)
+      if (url.searchParams.has('notls')) tls = false
+      if (!upgradeHeader || upgradeHeader !== 'websocket') {
         switch (url.pathname.toLowerCase()) {
-          case `/cf`:{
-            return new Response(JSON.stringify(request.cf, null, 4), {
-              status: 200,
-              headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-              }
-            })
-            }
+          case '/cf':
+            return new Response(JSON.stringify(request.cf), { status: 200 })
           case `/${token}`: {
-            const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, userAgent, RproxyIP)
+            const vlessConfig = await getVLESSConfig(
+              token,
+              userID,
+              request.headers.get('Host'),
+              sub,
+              userAgent,
+              RproxyIP
+            )
             const now = Date.now()
-            const timestamp = Math.floor(now / 1000)
-            const expire = 4102329600;//2099-12-31
+            const expire = 4102329600 //2099-12-31
             const today = new Date(now)
             today.setHours(0, 0, 0, 0)
-            const UD = Math.floor((((now - today.getTime()) / 86400000) * 24 * 1099511627776) / 2)
+            const UD = Math.floor(
+              (((now - today.getTime()) / 86400000) * 24 * 1099511627776) / 2
+            )
             if (userAgent && userAgent.includes('mozilla')) {
               return new Response(`${vlessConfig}`, {
                 status: 200,
@@ -82,30 +81,34 @@ export default {
                   'Content-Type': 'text/html;charset=utf-8'
                 }
               })
-              } else {
+            } else {
               return new Response(`${vlessConfig}`, {
                 status: 200,
                 headers: {
-                  'Content-Disposition': "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
+                  'Content-Disposition':
+                    "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
                   'Content-Type': 'text/plain;charset=utf-8',
                   'Profile-Update-Interval': '6',
-                  'Subscription-Userinfo': `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`
+                  'Subscription-Userinfo': `upload=${UD}; download=${UD}; total=${
+                    24 * 1099511627776
+                  }; expire=${expire}`
                 }
               })
             }
           }
-	  default:
-		url.hostname = proxydomain
-		url.protocol = 'https:'
-		request = new Request(url, request)
-		return await fetch(request)
+          default:
+              url.hostname = proxydomain
+              url.protocol = 'https:'
+              request = new Request(url, request)
+              return await fetch(request)
         }
       } else {
-	proxyIP = url.searchParams.get('proxyip') || proxyIP
-	if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.toLowerCase().split('/proxyip=')[1]
-	else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = `proxyip.${url.pathname.toLowerCase().split("/proxyip.")[1]}`
-	else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io'
-	return await vlessOverWSHandler(request)
+        if (new RegExp('/proxyip=', 'i').test(url.pathname))
+          proxyIP = url.pathname.split('=')[1]
+        else if (new RegExp('/proxyip.', 'i').test(url.pathname))
+          proxyIP = url.pathname.split('/proxyip.')[1]
+        else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io'
+        return await vlessOverWSHandler(request)
       }
     } catch (err) {
       /** @type {Error} */ let e = err
@@ -116,10 +119,8 @@ export default {
 
 /**
  *
- * @param {import("@cloudflare/workers-types").Request} request
  */
 async function vlessOverWSHandler(request) {
-  /** @type {import("@cloudflare/workers-types").WebSocket[]} */
   // @ts-ignore
   const webSocketPair = new WebSocketPair()
   const [client, webSocket] = Object.values(webSocketPair)
@@ -240,7 +241,6 @@ async function vlessOverWSHandler(request) {
  * @param {string} addressRemote The remote address to connect to.
  * @param {number} portRemote The remote port to connect to.
  * @param {ArrayBuffer} rawClientData The raw client data to write.
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket The WebSocket to pass the remote socket to.
  * @param {Uint8Array} vlessResponseHeader The VLESS response header.
  * @param {function} log The logging function.
  * @returns {Promise<void>} The remote socket.
@@ -256,7 +256,6 @@ async function handleTCPOutBound(
   log
 ) {
   async function connectAndWrite(address, port, socks = false) {
-    /** @type {import("@cloudflare/workers-types").Socket} */
     const tcpSocket = socks
       ? await socks5Connect(addressType, address, port, log)
       : connect({ hostname: address, port: port })
@@ -297,7 +296,6 @@ async function handleTCPOutBound(
 
 /**
  *
- * @param {import("@cloudflare/workers-types").WebSocket} webSocketServer
  * @param {string} earlyDataHeader for ws 0rtt
  * @param {(info: string)=> void} log for ws 0rtt
  */
@@ -347,8 +345,8 @@ function makeReadableWebSocketStream(webSocketServer, log, earlyDataHeader) {
   return stream
 }
 
-// | 1B      | 16B    | 1B           | MB	              |  1B  | 2B    |  1B    | SB  | XB
-// | version | UUID   | 附加信息长度 M | 附加信息 ProtoBuf | 指令  |  port | 地址类型 | 地址 |请求数据
+// | 1B      | 16B    | 1B            | MB               | 1B   | 2B   | 1B      | SB   | XB
+// | version | UUID   | 附加信息长度 M | 附加信息 ProtoBuf | 指令 | port | 地址类型 | 地址 |请求数据
 
 /**
  * @param {ArrayBuffer} vlessBuffer
@@ -468,8 +466,6 @@ function processVlessHeader(vlessBuffer, userID) {
 
 /**
  *
- * @param {import("@cloudflare/workers-types").Socket} remoteSocket
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket
  * @param {Uint8Array} vlessResponseHeader
  * @param {(() => Promise<void>) | null} retry
  * @param {*} log
@@ -553,7 +549,6 @@ const WS_READY_STATE_OPEN = 1
 const WS_READY_STATE_CLOSING = 2
 /**
  * Normally, WebSocket will not has exceptions when close.
- * @param {import("@cloudflare/workers-types").WebSocket} socket
  */
 function safeCloseWebSocket(socket) {
   try {
@@ -574,7 +569,28 @@ for (let i = 0; i < 256; ++i) {
   byteToHex.push((i + 256).toString(16).slice(1))
 }
 function unsafeStringify(arr, offset = 0) {
-  return (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
+  return (
+    byteToHex[arr[offset + 0]] +
+    byteToHex[arr[offset + 1]] +
+    byteToHex[arr[offset + 2]] +
+    byteToHex[arr[offset + 3]] +
+    '-' +
+    byteToHex[arr[offset + 4]] +
+    byteToHex[arr[offset + 5]] +
+    '-' +
+    byteToHex[arr[offset + 6]] +
+    byteToHex[arr[offset + 7]] +
+    '-' +
+    byteToHex[arr[offset + 8]] +
+    byteToHex[arr[offset + 9]] +
+    '-' +
+    byteToHex[arr[offset + 10]] +
+    byteToHex[arr[offset + 11]] +
+    byteToHex[arr[offset + 12]] +
+    byteToHex[arr[offset + 13]] +
+    byteToHex[arr[offset + 14]] +
+    byteToHex[arr[offset + 15]]
+  ).toLowerCase()
 }
 function stringify(arr, offset = 0) {
   const uuid = unsafeStringify(arr, offset)
@@ -586,7 +602,6 @@ function stringify(arr, offset = 0) {
 
 /**
  *
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket
  * @param {Uint8Array} vlessResponseHeader
  * @param {(string) => void} log
  */
@@ -608,7 +623,7 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
       new WritableStream({
         /**@param {ArrayBuffer} chunk  */
         async write(chunk) {
-          const res = await fetch('https://dns.google/dns-query', {
+          const res = await fetch('https://1.1.1.1/dns-query', {
             method: 'POST',
             headers: { 'content-type': 'application/dns-message' },
             body: chunk
@@ -823,7 +838,9 @@ function socks5AddressParser(address) {
 
 function revertFakeInfo(content, userID, hostName, isBase64) {
   if (isBase64) content = atob(content) //Base64解码
-  content = content.replace(new RegExp(fakeUserID, 'g'), userID).replace(new RegExp(fakeHostName, 'g'), hostName)
+  content = content
+    .replace(new RegExp(fakeUserID, 'g'), userID)
+    .replace(new RegExp(fakeHostName, 'g'), hostName)
   if (isBase64) content = btoa(content) //Base64编码
 
   return content
@@ -838,7 +855,8 @@ function generateRandomNumber() {
 function generateRandomString() {
   let minLength = 2
   let maxLength = 3
-  let length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength
+  let length =
+    Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength
   let characters = 'abcdefghijklmnopqrstuvwxyz'
   let result = ''
   for (let i = 0; i < length; i++) {
@@ -857,7 +875,9 @@ function generateUUID() {
       uuid += String.fromCharCode(num + 55)
     }
   }
-  return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5').toLowerCase()
+  return uuid
+    .replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5')
+    .toLowerCase()
 }
 
 /**
@@ -869,8 +889,8 @@ function generateUUID() {
  * @returns {Promise<string>}
  */
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
-	if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
-		return `
+  if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
+    return `
 		<!DOCTYPE html>
 		<html>
 		<head>
@@ -896,7 +916,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 		<p><em>Thank you for using nginx.</em></p>
 		</body>
 		</html>
-		`;
+		`
 	}else {
 		if (typeof fetch != 'function') {
 			return 'Error: fetch is not available in this environment.'
