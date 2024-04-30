@@ -1,7 +1,7 @@
-// <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:05 UTC<!--GAMFC-END-->.
-//@ts-ignore
-import { connect } from 'cloudflare:sockets'
-//以下变量使用cloudflare项目内变量自行设置仅供参考
+// <!--GAMFC-->version base on commit 841ed4e9ff121dde0ed6a56ae800c2e6c4f66056, time is 2024-04-16 18:02:38 UTC<!--GAMFC-END-->.
+// @ts-ignore
+import { connect } from 'cloudflare:sockets';
+//使用cloudflare项目内变量自行设置，以下内容仅供参考
 let userID = '90cd4a77-141a-43c9-991b-08263cfe9c10'
 let token= 'vless'
 let RproxyIP = 'true'
@@ -16,15 +16,18 @@ if (!isValidUUID(userID)) {
   throw new Error('uuid is not valid')
 }
 
-let parsedSocks5Address = {}
-let enableSocks = false
+let parsedSocks5Address = {}; 
+let enableSocks = false;
 
-let fakeUserID = generateUUID()
-let fakeHostName = generateRandomString()
-let tls = true
+let fakeUserID = generateUUID();
+let fakeHostName = generateRandomString();
+let tls = true;
+
 export default {
   /**
+   * @param {import("@cloudflare/workers-types").Request} request
    * @param {{UUID, TOKEN, SOCKS5, PROXYIP, RPROXYIP, SUB, SUBAPI, SUBCONFIG, PROXYDOMAIN: string}} env
+   * @param {import("@cloudflare/workers-types").ExecutionContext} ctx
    * @returns {Promise<Response>}
    */
   async fetch(request, env, _ctx) {
@@ -34,9 +37,9 @@ export default {
       token = env.TOKEN || token
       proxyIP = env.PROXYIP || proxyIP
       socks5Address = env.SOCKS5 || socks5Address
-      proxydomain = env.PROXYDOMAIN || proxydomain
       sub = env.SUB || sub
       subconverter = env.SUBAPI || subconverter
+      proxydomain = env.PROXYDOMAIN || proxydomain
       subconfig = env.SUBCONFIG || subconfig
       if (socks5Address) {
         RproxyIP = env.RPROXYIP || 'false'
@@ -103,13 +106,12 @@ export default {
               return await fetch(request)
         }
       } else {
-        if (new RegExp('/proxyip=', 'i').test(url.pathname))
-          proxyIP = url.pathname.split('=')[1]
-        else if (new RegExp('/proxyip.', 'i').test(url.pathname))
-          proxyIP = url.pathname.split('/proxyip.')[1]
-        else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io'
-        return await vlessOverWSHandler(request)
-      }
+	proxyIP = url.searchParams.get('proxyip') || proxyIP;
+	if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.toLowerCase().split('/proxyip=')[1];
+	else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = `proxyip.${url.pathname.toLowerCase().split("/proxyip.")[1]}`;
+	else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io';
+	return await vlessOverWSHandler(request);
+	}
     } catch (err) {
       /** @type {Error} */ let e = err
       return new Response(e.toString())
@@ -119,8 +121,10 @@ export default {
 
 /**
  *
+ * @param {import("@cloudflare/workers-types").Request} request
  */
 async function vlessOverWSHandler(request) {
+  /** @type {import("@cloudflare/workers-types").WebSocket[]} */
   // @ts-ignore
   const webSocketPair = new WebSocketPair()
   const [client, webSocket] = Object.values(webSocketPair)
@@ -241,6 +245,7 @@ async function vlessOverWSHandler(request) {
  * @param {string} addressRemote The remote address to connect to.
  * @param {number} portRemote The remote port to connect to.
  * @param {ArrayBuffer} rawClientData The raw client data to write.
+ * @param {import("@cloudflare/workers-types").WebSocket} webSocket The WebSocket to pass the remote socket to.
  * @param {Uint8Array} vlessResponseHeader The VLESS response header.
  * @param {function} log The logging function.
  * @returns {Promise<void>} The remote socket.
@@ -256,6 +261,7 @@ async function handleTCPOutBound(
   log
 ) {
   async function connectAndWrite(address, port, socks = false) {
+    /** @type {import("@cloudflare/workers-types").Socket} */
     const tcpSocket = socks
       ? await socks5Connect(addressType, address, port, log)
       : connect({ hostname: address, port: port })
@@ -296,6 +302,7 @@ async function handleTCPOutBound(
 
 /**
  *
+ * @param {import("@cloudflare/workers-types").WebSocket} webSocketServer
  * @param {string} earlyDataHeader for ws 0rtt
  * @param {(info: string)=> void} log for ws 0rtt
  */
@@ -345,8 +352,8 @@ function makeReadableWebSocketStream(webSocketServer, log, earlyDataHeader) {
   return stream
 }
 
-// | 1B      | 16B    | 1B            | MB               | 1B   | 2B   | 1B      | SB   | XB
-// | version | UUID   | 附加信息长度 M | 附加信息 ProtoBuf | 指令 | port | 地址类型 | 地址 |请求数据
+// | 1B      | 16B    | 1B            | MB	         |  1B   | 2B    |  1B     | SB   | XB
+// | version | UUID   | 附加信息长度 M | 附加信息 ProtoBuf | 指令  |  port | 地址类型 | 地址 |请求数据
 
 /**
  * @param {ArrayBuffer} vlessBuffer
@@ -466,6 +473,8 @@ function processVlessHeader(vlessBuffer, userID) {
 
 /**
  *
+ * @param {import("@cloudflare/workers-types").Socket} remoteSocket
+ * @param {import("@cloudflare/workers-types").WebSocket} webSocket
  * @param {Uint8Array} vlessResponseHeader
  * @param {(() => Promise<void>) | null} retry
  * @param {*} log
@@ -549,6 +558,7 @@ const WS_READY_STATE_OPEN = 1
 const WS_READY_STATE_CLOSING = 2
 /**
  * Normally, WebSocket will not has exceptions when close.
+ * @param {import("@cloudflare/workers-types").WebSocket} socket
  */
 function safeCloseWebSocket(socket) {
   try {
@@ -602,6 +612,7 @@ function stringify(arr, offset = 0) {
 
 /**
  *
+ * @param {import("@cloudflare/workers-types").WebSocket} webSocket
  * @param {Uint8Array} vlessResponseHeader
  * @param {(string) => void} log
  */
@@ -889,8 +900,8 @@ function generateUUID() {
  * @returns {Promise<string>}
  */
 async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
-  if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
-    return `
+	if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
+		return `
 		<!DOCTYPE html>
 		<html>
 		<head>
@@ -931,6 +942,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 		} else {
 			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
 		}
+
 		let url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`
 		let isBase64 = false
 		if (userAgent.includes('clash') && !userAgent.includes('nekobox')) {
@@ -940,6 +952,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 		} else {
 			isBase64 = true
 		}
+
 		try {
 			const response = await fetch(url ,{
 			headers: {
