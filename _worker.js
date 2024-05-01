@@ -28,7 +28,8 @@ export default {
 	 */
 	async fetch(request, env, ctx) {
 		try {
-			const userAgent = request.headers.get('User-Agent').toLowerCase();
+			const UA = request.headers.get('User-Agent') || 'null';
+			const userAgent = UA.toLowerCase();
 			userID = (env.UUID || userID).toLowerCase();
 			token = env.TOKEN || token;
 			proxyIP = env.PROXYIP || proxyIP;
@@ -44,9 +45,9 @@ export default {
 				// const url = new URL(request.url);
 				switch (url.pathname.toLowerCase()) {
 				case `/cf`:
-					return new Response(JSON.stringify(request.cf), { status: 200 });
+					return new Response(JSON.stringify(request.cf, null, 4), { status: 200 });
 				case `/${token}`: {
-					const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+					const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
 					const now = Date.now();
 					const timestamp = Math.floor(now / 1000);
 					const expire = 4102329600;//2099-12-31
@@ -58,6 +59,8 @@ export default {
 							status: 200,
 							headers: {
 								"Content-Type": "text/html;charset=utf-8",
+								"Profile-Update-Interval": "6",
+								"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
 							}
 						});
 					} else {
@@ -664,16 +667,19 @@ function generateUUID() {
 	return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5').toLowerCase();
 }
 
+let subParams = ['sub','base64','b64','clash','singbox','sb'];
+
 /**
  * @param {string} token
  * @param {string} userID
  * @param {string | null} hostName
  * @param {string} sub
- * @param {string} userAgent
+ * @param {string} UA
  * @returns {Promise<string>}
  */
-async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP) {
-	if ((!sub || sub === '') || (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86'))) {
+async function getVLESSConfig(token, userID, hostName, sub, UA, RproxyIP, _url) {
+	const userAgent = UA.toLowerCase();
+	if ((!sub || sub === '' || (sub && userAgent.includes('mozilla'))) && !subParams.some(_searchParams => _url.searchParams.has(_searchParams))) {
 		return `
 		<!DOCTYPE html>
 		<html>
@@ -701,7 +707,7 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 		</body>
 		</html>
 		`;
-       } else {
+        } else {
 		if (typeof fetch != 'function') {
 			return 'Error: fetch is not available in this environment.';
 		}
@@ -718,17 +724,18 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 
 		let url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
 		let isBase64 = false;
-		if (userAgent.includes('clash') && !userAgent.includes('nekobox')) {
+		if ((userAgent.includes('clash') && !userAgent.includes('nekobox')) || ( _url.searchParams.has('clash') && !userAgent.includes('subconverter'))) {
 			url = `https://${subconverter}/sub?target=clash&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
+		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox') || (( _url.searchParams.has('singbox') || _url.searchParams.has('sb')) && !userAgent.includes('subconverter'))) {
 			url = `https://${subconverter}/sub?target=singbox&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 		} else {
 			isBase64 = true;
 		}
+
 		try {
 			const response = await fetch(url ,{
 			headers: {
-				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+				'User-Agent': `${UA} CF-Workers-edgetunnel/cmliu`
 			}});
 			const content = await response.text();
 			return revertFakeInfo(content, userID, hostName, isBase64);
@@ -736,5 +743,6 @@ async function getVLESSConfig(token, userID, hostName, sub, userAgent, RproxyIP)
 			console.error('Error fetching content:', error);
 			return `Error fetching content: ${error.message}`;
 		}
+
 	}
 }
