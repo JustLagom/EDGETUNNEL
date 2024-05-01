@@ -54,8 +54,8 @@ export default {
 							},
 						});
 					}
-					case `/${token}`: {
-						const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
+					case `/${userID}`: {
+						const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
 						const now = Date.now();
 						const timestamp = Math.floor(now / 1000);
 						const expire = 4102329600;//2099-12-31
