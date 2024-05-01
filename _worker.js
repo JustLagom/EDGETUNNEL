@@ -150,7 +150,7 @@ async function vlessOverWSHandler(request) {
 	const readableWebSocketStream = makeReadableWebSocketStream(webSocket, earlyDataHeader, log);
 
 	/** @type {{ value: import("@cloudflare/workers-types").Socket | null}}*/
-	let remoteSocketWapper = {
+	const remoteSocketWapper = {
 		value: null,
 	};
 	let udpStreamWrite = null;
@@ -470,7 +470,7 @@ function processVlessHeader(vlessBuffer, userID) {
  * Converts a remote socket to a WebSocket connection.
  * @param {import("@cloudflare/workers-types").Socket} remoteSocket The remote socket to convert.
  * @param {import("@cloudflare/workers-types").WebSocket} webSocket The WebSocket to connect to.
- * @param {ArrayBuffer | null} vlessResponseHeader The VLESS response header.
+ * @param {Uint8Array} vlessResponseHeader The VLESS response header.
  * @param {(() => Promise<void>) | null} retry The function to retry the connection if it fails.
  * @param {(info: string) => void} log The logging function.
  * @returns {Promise<void>} A Promise that resolves when the conversion is complete.
@@ -479,7 +479,7 @@ async function remoteSocketToWS(remoteSocket, webSocket, vlessResponseHeader, re
 	// remote--> ws
 	let remoteChunkCount = 0;
 	let chunks = [];
-	/** @type {ArrayBuffer | null} */
+	/** @type {Uint8Array | null} */
 	let vlessHeader = vlessResponseHeader;
 	let hasIncomingData = false; // check if remoteSocket has incoming data
 	await remoteSocket.readable
@@ -501,7 +501,7 @@ async function remoteSocketToWS(remoteSocket, webSocket, vlessResponseHeader, re
 						);
 					}
 					if (vlessHeader) {
-						webSocket.send(await new Blob([vlessHeader, chunk]).arrayBuffer());
+						webSocket.send(new Uint8Array([...vlessHeader, ...chunk]).buffer);
 						vlessHeader = null;
 					} else {
 						// console.log(`remoteSocketToWS send chunk ${chunk.byteLength}`);
@@ -608,7 +608,7 @@ function stringify(arr, offset = 0) {
 /**
  * Handles outbound UDP traffic by transforming the data into DNS queries and sending them over a WebSocket connection.
  * @param {import("@cloudflare/workers-types").WebSocket} webSocket The WebSocket connection to send the DNS queries over.
- * @param {ArrayBuffer} vlessResponseHeader The VLESS response header.
+ * @param {Uint8Array} vlessResponseHeader The VLESS response header.
  * @param {(string) => void} log The logging function.
  * @returns {{write: (chunk: Uint8Array) => void}} An object with a write method that accepts a Uint8Array chunk to write to the transform stream.
  */
@@ -619,15 +619,17 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 		start(controller) {
 
 		},
+		/**
+		 * @param {ArrayBuffer} chunk 
+		 * @param {TransformStreamDefaultController<ArrayBuffer>} controller 
+		 */
 		transform(chunk, controller) {
 			// udp message 2 byte is the the length of udp data
-			// TODO: this should have bug, beacsue maybe udp chunk can be in two websocket message
+			// TODO: this should have bug, because maybe udp chunk can be in two websocket message
 			for (let index = 0; index < chunk.byteLength;) {
 				const lengthBuffer = chunk.slice(index, index + 2);
 				const udpPakcetLength = new DataView(lengthBuffer).getUint16(0);
-				const udpData = new Uint8Array(
-					chunk.slice(index + 2, index + 2 + udpPakcetLength)
-				);
+				const udpData = chunk.slice(index + 2, index + 2 + udpPakcetLength);
 				index = index + 2 + udpPakcetLength;
 				controller.enqueue(udpData);
 			}
@@ -638,6 +640,7 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 
 	// only handle dns udp for now
 	transformStream.readable.pipeTo(new WritableStream({
+		/**@param {ArrayBuffer} chunk*/
 		async write(chunk) {
 			const resp = await fetch(dohURL, // dns server url
 				{
@@ -654,9 +657,9 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 			if (webSocket.readyState === WS_READY_STATE_OPEN) {
 				log(`doh success and dns message length is ${udpSize}`);
 				if (isVlessHeaderSent) {
-					webSocket.send(await new Blob([udpSizeBuffer, dnsQueryResult]).arrayBuffer());
+					webSocket.send(udpSizeBuffer.buffer);
 				} else {
-					webSocket.send(await new Blob([vlessResponseHeader, udpSizeBuffer, dnsQueryResult]).arrayBuffer());
+					webSocket.send(udpSizeBuffer.buffer);
 					isVlessHeaderSent = true;
 				}
 			}
@@ -668,10 +671,7 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 	const writer = transformStream.writable.getWriter();
 
 	return {
-		/**
-		 * 
-		 * @param {Uint8Array} chunk 
-		 */
+		/**@param {ArrayBuffer} chunk */
 		write(chunk) {
 			writer.write(chunk);
 		}
