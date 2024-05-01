@@ -54,7 +54,7 @@ export default {
 							},
 						});
 					}
-					case `/${userID}`: {
+					case `/${token}`: {
 						const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
 						const now = Date.now();
 						const timestamp = Math.floor(now / 1000);
