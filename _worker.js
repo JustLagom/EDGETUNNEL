@@ -44,16 +44,7 @@ export default {
 			const url = new URL(request.url);
 			if (url.searchParams.has('notls')) tls = false;
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
-				// const url = new URL(request.url);
 				switch (url.pathname.toLowerCase()) {
-					case `/cf`: {
-						return new Response(JSON.stringify(request.cf, null, 4), {
-							status: 200,
-							headers: {
-								"Content-Type": "application/json;charset=utf-8",
-							},
-						});
-					}
 					case `/${token}`: {
 						const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
 						const now = Date.now();
@@ -84,11 +75,11 @@ export default {
 						}
 					}
 					default:
-						url.hostname = proxydomain;
-						url.protocol = 'https:';
-						request = new Request(url, request);
-						return await fetch(request);
-				  }
+					        url.hostname = proxydomain;
+					        url.protocol = 'https:';
+					        request = new Request(url, request);
+					        return await fetch(request);
+				}
 			} else {
 				proxyIP = url.searchParams.get('proxyip') || proxyIP;
 				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.toLowerCase().split('/proxyip=')[1];
@@ -465,7 +456,6 @@ function processVlessHeader(vlessBuffer, userID) {
 	};
 }
 
-
 /**
  * Converts a remote socket to a WebSocket connection.
  * @param {import("@cloudflare/workers-types").Socket} remoteSocket The remote socket to convert.
@@ -761,7 +751,6 @@ async function getVLESSConfig(token, userID, hostName, sub, UA, RproxyIP, _url) 
 		if (typeof fetch != 'function') {
 			return 'Error: fetch is not available in this environment.';
 		}
-		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
 		if (hostName.includes(".workers.dev")){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
 		} else if (hostName.includes(".pages.dev")){
@@ -773,15 +762,17 @@ async function getVLESSConfig(token, userID, hostName, sub, UA, RproxyIP, _url) 
 		}
 
 		let url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
-		let isBase64 = false;
-		if ((userAgent.includes('clash') && !userAgent.includes('nekobox')) || ( _url.searchParams.has('clash') && !userAgent.includes('subconverter'))) {
-			url = `https://${subconverter}/sub?target=clash&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox') || (( _url.searchParams.has('singbox') || _url.searchParams.has('sb')) && !userAgent.includes('subconverter'))) {
-			url = `https://${subconverter}/sub?target=singbox&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-		} else {
-			isBase64 = true;
+		let isBase64 = true;
+		if (!userAgent.includes(('CF-Workers-SUB').toLowerCase())){
+			if ((userAgent.includes('clash') && !userAgent.includes('nekobox')) || ( _url.searchParams.has('clash') && !userAgent.includes('subconverter'))) {
+				url = `https://${subconverter}/sub?target=clash&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+				isBase64 = false;
+			} else if (userAgent.includes('sing-box') || userAgent.includes('singbox') || (( _url.searchParams.has('singbox') || _url.searchParams.has('sb')) && !userAgent.includes('subconverter'))) {
+				url = `https://${subconverter}/sub?target=singbox&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+				isBase64 = false;
+			}
 		}
-
+		
 		try {
 			const response = await fetch(url ,{
 			headers: {
