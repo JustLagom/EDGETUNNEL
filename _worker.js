@@ -5,7 +5,7 @@ let userID = 'd342d11e-d424-4583-b36e-524ab1f0afa4';
 let token= 'vless';
 let RproxyIP = 'true';
 let proxydomain = 'www.bing.com';
-let dohURL = 'https://sky.rethinkdns.com/1:-Pf_____9_8A_AMAIgE8kMABVDDmKOHTAKg=';
+let dohURL = 'https://dns.google/dns-query';
 let sub = 'vless-4ca.pages.dev';
 let subconverter = 'apiurl.v1.mk';
 let subconfig = 'https://raw.githubusercontent.com/JustLagom/test/main/urltestconfig.ini';
