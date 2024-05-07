@@ -47,33 +47,13 @@ export default {
 				switch (url.pathname.toLowerCase()) {
 					case `/${token}`: {
 						const vlessConfig = await getVLESSConfig(token, userID, request.headers.get('Host'), sub, UA, RproxyIP, url);
-						const now = Date.now();
-						const timestamp = Math.floor(now / 1000);
-						const expire = 4102329600;//2099-12-31
-						const today = new Date(now);
-						today.setHours(0, 0, 0, 0);
-						const UD = Math.floor(((now - today.getTime())/86400000) * 24 * 1099511627776 / 2);
-						if (userAgent && userAgent.includes('mozilla')){
-							return new Response(`${vlessConfig}`, {
-								status: 200,
-								headers: {
-									"Content-Type": "text/html;charset=utf-8",
-									"Profile-Update-Interval": "6",
-									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
-								}
-							});
-						} else {
-							return new Response(`${vlessConfig}`, {
-								status: 200,
-								headers: {
-									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
-									"Content-Type": "text/plain;charset=utf-8",
-									"Profile-Update-Interval": "6",
-									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
-								}
-							});
-						}
-					}
+						return new Response(`${vlessConfig}`, {
+							status: 200,
+							headers: {
+								"Content-Type": "text/plain;charset=utf-8",
+							}
+						});
+					} 
 					default:
 					        url.hostname = proxydomain;
 					        url.protocol = 'https:';
@@ -81,10 +61,10 @@ export default {
 					        return await fetch(request);
 				}
 			} else {
-				proxyIP = url.searchParams.get('proxyip') || proxyIP;
-				if (new RegExp('/proxyip=', 'i').test(url.pathname)) proxyIP = url.pathname.toLowerCase().split('/proxyip=')[1];
-				else if (new RegExp('/proxyip.', 'i').test(url.pathname)) proxyIP = `proxyip.${url.pathname.toLowerCase().split("/proxyip.")[1]}`;
-				else if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io';
+				// 从查询字符串中获取'proxyip'参数
+				proxyIP = url.searchParams.get('proxyIP') || proxyIP;
+				// 如果查询字符串中没有'proxyip'参数，则使用默认值
+				if (!proxyIP || proxyIP == '') proxyIP = 'proxyip.fxxk.dedyn.io';
 				return await vlessOverWSHandler(request);
 			}
 		} catch (err) {
@@ -710,8 +690,7 @@ function generateUUID() {
 let subParams = ['sub','base64','b64','clash','singbox','sb'];
 
 /**
- * @param {string} token
- * @param {string} userID
+ * @param {string} password
  * @param {string | null} hostName
  * @param {string} sub
  * @param {string} UA
@@ -720,70 +699,16 @@ let subParams = ['sub','base64','b64','clash','singbox','sb'];
 async function getVLESSConfig(token, userID, hostName, sub, UA, RproxyIP, _url) {
 	const userAgent = UA.toLowerCase();
 	if ((!sub || sub === '' || (sub && userAgent.includes('mozilla'))) && !subParams.some(_searchParams => _url.searchParams.has(_searchParams))) {
-		return `
-		<!DOCTYPE html>
-		<html>
-		<head>
-		<title>Welcome to nginx!</title>
-		<style>
-			body {
-				width: 35em;
-				margin: 0 auto;
-				font-family: Tahoma, Verdana, Arial, sans-serif;
-			}
-		</style>
-		</head>
-		<body>
-		<h1>Welcome to nginx!</h1>
-		<p>If you see this page, the nginx web server is successfully installed and
-		working. Further configuration is required.</p>
-		
-		<p>For online documentation and support please refer to
-		<a href="http://nginx.org/">nginx.org</a>.<br/>
-		Commercial support is available at
-		<a href="http://nginx.com/">nginx.com</a>.</p>
-		
-		<p><em>Thank you for using nginx.</em></p>
-		</body>
-		</html>
-		`;
-        } else {
-		if (typeof fetch != 'function') {
-			return 'Error: fetch is not available in this environment.';
-		}
-		if (hostName.includes(".workers.dev")){
-			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
-		} else if (hostName.includes(".pages.dev")){
-			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
-		} else if (hostName.includes("worker") || hostName.includes("notls") || tls == false){
-			fakeHostName = `notls.${fakeHostName}${generateRandomNumber()}.net`;
-		} else {
-			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
-		}
-
-		let url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
-		let isBase64 = true;
-		if (!userAgent.includes(('CF-Workers-SUB').toLowerCase())){
-			if ((userAgent.includes('clash') && !userAgent.includes('nekobox')) || ( _url.searchParams.has('clash') && !userAgent.includes('subconverter'))) {
-				url = `https://${subconverter}/sub?target=clash&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-				isBase64 = false;
-			} else if (userAgent.includes('sing-box') || userAgent.includes('singbox') || (( _url.searchParams.has('singbox') || _url.searchParams.has('sb')) && !userAgent.includes('subconverter'))) {
-				url = `https://${subconverter}/sub?target=singbox&url=${encodeURIComponent(url)}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-				isBase64 = false;
-			}
-		}
-		
-		try {
-			const response = await fetch(url ,{
-			headers: {
-				'User-Agent': `${UA} CF-Workers-edgetunnel/cmliu`
-			}});
-			const content = await response.text();
-			return revertFakeInfo(content, userID, hostName, isBase64);
-		} catch (error) {
-			console.error('Error fetching content:', error);
-			return `Error fetching content: ${error.message}`;
-		}
-
-	}
+    return `
+    <p>===================================================配置详解=======================================================</p>
+      Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
+    --------------------------------------------------------------------------------------------------------------------
+      订阅地址：https://${sub}/sub?host=${hostName}&uuid=${UserID}&edgetunnel=cmliu&proxyip=${RproxyIP}
+    <p>=================================================================================================================</p>
+      github 项目地址 Star!Star!Star!!!
+      telegram 交流群 技术大佬~在线发牌!
+      https://t.me/CMLiussss
+    <p>=================================================================================================================</p>
+    `
+  }
 }
