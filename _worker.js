@@ -703,7 +703,7 @@ async function getVLESSConfig(token, userID, hostName, sub, UA, RproxyIP, _url) 
     <p>===================================================配置详解=======================================================</p>
       Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
     --------------------------------------------------------------------------------------------------------------------
-      订阅地址：https://${sub}/sub?host=${hostName}&uuid=${UserID}&edgetunnel=cmliu&proxyip=${RproxyIP}
+      订阅地址：https://${sub}/sub?host=${hostName}&uuid=${userID}&edgetunnel=cmliu&proxyip=${RproxyIP}
     <p>=================================================================================================================</p>
       github 项目地址 Star!Star!Star!!!
       telegram 交流群 技术大佬~在线发牌!
