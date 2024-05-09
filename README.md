@@ -1,11 +1,11 @@
 ## 快速上手
 
-### 一、VlessSub（为VLESS订阅器代码） 可参考vless订阅器部署方式自行部署，添加优选ip api
+### 一、VlessSub（为VLESS订阅器代码）可参考vless订阅器的部署方式自行部署，添加优选ip api
 
 ### https://订阅器域名/sub?host=xxxx&uuid=xxxx&proxyip=true或者false（true即启用订阅器内设置proxyIP）。
 
 ------------------------------------------------------------------------
-### 二、_worker.js（为Vless节点配置）部署仅需更改uuid，和token
+### 二、_worker.js（为VLESS节点配置）部署仅需更改uuid，和token
 
 ### https://[你的域名]/[你的token]即为自适应订阅链接页面获取订阅链接。
 
