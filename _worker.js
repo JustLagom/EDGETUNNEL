@@ -1,17 +1,16 @@
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 //伪装主页设置
-let token= 'vless';
-let pdomain = 'www.bing.com';
+let token= 'error';
+let pdomain = 'www.pptv.com';
 //uuid设置
 let userID = 'd342d11e-d424-4583-b36e-524ab1f0afa4';
 //订阅器设置
-let RproxyIP = 'true';
-let sub = 'vless-4ca.pages.dev';
-let subconverter = 'url.v1.mk';
+let RproxyIP = 'false';
+let sub = 'alvless.comorg.us.kg';
 let subconfig = 'https://raw.githubusercontent.com/JustLagom/WorkerSub/main/urltestconfig.ini';
 //CF网络穿透设置 一:proxyip，二:SOCKS5
-let proxyIP = '';
+let proxyIP = 'edgetunnel.anycast.eu.org';
 let socks5Address = '';
 
 if (!isValidUUID(userID)) {
@@ -23,7 +22,7 @@ let enableSocks = false;
 
 export default {
 	/**
-	 * @param {{TOKEN, PDOMAIN, UUID, RPROXYIP, SUB, SUBAPI, SUBCONFIG, PROXYIP, SOCKS5: string}} env
+	 * @param {{TOKEN, PDOMAIN, UUID, RPROXYIP, SUB, SUBCONFIG, PROXYIP, SOCKS5: string}} env
 	 * @returns {Promise<Response>}
 	 */
 	async fetch(request, env, ctx) {
@@ -33,7 +32,6 @@ export default {
 			userID = env.UUID || userID;
 			RproxyIP = env.RPROXYIP || RproxyIP
 			sub = env.SUB || sub;
-			subconverter = env.SUBAPI || subconverter;
 			subconfig = env.SUBCONFIG || subconfig;
 			proxyIP = env.PROXYIP || proxyIP;
 			socks5Address = env.SOCKS5 || socks5Address;
