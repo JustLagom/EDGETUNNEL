@@ -50,8 +50,8 @@ export default {
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				switch (url.pathname) {					
 					case `/${token}`: {
-						const Config = await getCONFIGg(userID, request.headers.get('Host'), sub, RproxyIP, url);
-						return new Response(`${vlessConfig}`, {
+						const Config = await getCONFIG(userID, request.headers.get('Host'), sub, RproxyIP, url);
+						return new Response(`${Config}`, {
 							status: 200,
 							headers: {
 								"Content-Type": "text/plain;charset=utf-8",
@@ -814,7 +814,7 @@ function socks5AddressParser(address) {
  * @param {string} userID 
  * @param {string | null} hostName
  */
-async function getVCONFIG(userID, hostName, sub, RproxyIP, _url) {
+async function getCONFIG(userID, hostName, sub, RproxyIP, _url) {
     return `
     <p>===================================================配置详解=======================================================</p>
       Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 是否使用订阅器内置ProxyIP: ${RproxyIP}.
