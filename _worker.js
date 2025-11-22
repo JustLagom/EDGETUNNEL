@@ -1,9 +1,23 @@
+/**
+ * Project: Titanium-V Core (TitanStallion Evolution)
+ * Version: v4.0.0
+ * * 🌟 核心优势 (Core Advantages):
+ * 1. 隐蔽性极强: 完美的伪装机制，默认访问域名显示“TechNote”技术博客，仅在路径完全匹配密钥时显示控制面板。
+ * 2. 高可用架构 (ReactionMax): 具备多策略自动重连、连接停滞检测、主动心跳机制，确保连接稳如泰山。
+ * 3. 智能配置生成: 面板自动识别当前 Worker 域名 (Host)，支持自定义优选 IP 地址，一键生成 VLESS/Clash 配置。
+ * 4. 生产级特性: 内置 SOCKS5 前置代理支持、流量吞吐量实时评分系统。
+ *
+ * 🚀 优化方向 (Optimization Roadmap):
+ * 1. 内存管理: 已在 v4.0 中增加定期清理过期会话缓存的机制，防止长连接下的内存泄漏。
+ * 2. 协议伪装: 建议配合 Cloudflare 优选 IP 使用，以降低被 SNI 阻断的风险。
+ * 3. 传输层: 目前基于 TCP，未来可探索利用 HTTP/3 (QUIC) 改善高丢包环境下的表现。
+ */
 
 import { connect } from 'cloudflare:sockets';
 
 // ==================== 1. 全局配置 ====================
 const 全局配置 = {
-    密钥: "abc", // 【重要】请修改此处，这是你的连接密码
+    密钥: "abc", // 【重要】请修改此处，这是你的连接密码，也是管理面板的路径
     默认兜底反代: "ProxyIP.US.CMLiussss.net:443",
     
     // 策略开关
@@ -28,7 +42,7 @@ const 全局配置 = {
     吞吐量阈值_差: 50,
 };
 
-// ==================== 2. 生产级特性 (保持不变) ====================
+// ==================== 2. 生产级特性 ====================
 class 遥测 {
     推送(事件, 数据 = {}) {
         // 仅在出错或关键节点输出日志，避免日志爆炸
@@ -40,7 +54,11 @@ class 遥测 {
 const 遥测记录器 = new 遥测();
 
 class 会话缓存 {
-    constructor() { this._映射 = new Map(); }
+    constructor() { 
+        this._映射 = new Map(); 
+        // [v4.0 优化] 定期清理过期缓存，防止内存泄漏
+        setInterval(() => this.清理(), 10 * 60 * 1000);
+    }
     设置(键) { this._映射.set(键, Date.now()); }
     存在(键) {
         const 时间戳 = this._映射.get(键);
@@ -51,10 +69,18 @@ class 会话缓存 {
         }
         return true;
     }
+    清理() {
+        const 现在 = Date.now();
+        for (const [键, 时间戳] of this._映射) {
+            if (现在 - 时间戳 > 全局配置.会话缓存TTL) {
+                this._映射.delete(键);
+            }
+        }
+    }
 }
 const 会话缓存实例 = new 会话缓存();
 
-// ==================== 3. 核心辅助函数 (保持不变) ====================
+// ==================== 3. 核心辅助函数 ====================
 function 转换WebSocket为流(webSocket) {
     const 可读流 = new ReadableStream({
         start(控制器) {
@@ -251,7 +277,7 @@ function 转换IPv6文本为字节(地址文本) {
 
 function 检查主机是否在强制S5名单(主机) {
     if (!主机) return false;
-    主机 = 主机.toLowerCase();
+    主机 =主机.toLowerCase();
     return 全局配置.强制S5名单.some(规则 => {
         规则 = 规则.toLowerCase();
         if (规则.startsWith('*.')) {
@@ -279,7 +305,6 @@ async function 处理WebSocket会话(服务端套接字, 请求) {
     let 网络评分 = 1.0; 
     
     try {
-        // 遥测记录器.推送('session_start', { client: 客户端信息 }); // 减少日志
         const 首个数据包 = await new Promise((resolve, reject) => {
             const 计时器 = setTimeout(() => reject(new Error('首包超时')), 全局配置.首次数据包超时);
             服务端套接字.addEventListener('message', e => {
@@ -432,39 +457,39 @@ async function 处理WebSocket会话(服务端套接字, 请求) {
 
 // ==================== 5. Dashboard 前端资源 & 伪装页面 ====================
 
-// 1. 配置面板 (已修改逻辑：地址默认为 www.shopify.com，Host 自动识别)
+// 1. 配置面板 (Titanium-V 风格，自动识别Host，Address默认www.shopify.com)
 const DASHBOARD_HTML = `
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TitanStallion 配置生成器</title>
+    <title>Titanium-V Configurator</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --accent: #38bdf8; --border: #334155; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .container { background: var(--card); border-radius: 16px; padding: 30px; width: 100%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid var(--border); }
-        h1 { margin: 0 0 20px 0; font-size: 1.5rem; color: var(--accent); display: flex; align-items: center; gap: 10px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; box-sizing: border-box; transition: 0.2s; }
-        input:focus { border-color: var(--accent); }
-        .btn { background: var(--accent); color: #0f172a; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn:hover { opacity: 0.9; }
-        .result-box { margin-top: 20px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px dashed var(--border); position: relative; }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
-        code { display: block; word-break: break-all; font-family: monospace; font-size: 0.85rem; color: #cbd5e1; max-height: 100px; overflow-y: auto; }
-        .copy-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
-        .copy-btn:hover { background: rgba(56, 189, 248, 0.1); }
-        .footer { margin-top: 20px; text-align: center; font-size: 0.75rem; color: #64748b; }
+        :root { --bg: #0b0e14; --card: #151b26; --text: #e2e8f0; --accent: #0ea5e9; --border: #2d3748; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { background: var(--card); border-radius: 12px; padding: 32px; width: 100%; max-width: 580px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border); }
+        h1 { margin: 0 0 24px 0; font-size: 1.5rem; color: var(--accent); display: flex; align-items: center; letter-spacing: 0.5px; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
+        input { width: 100%; padding: 12px; background: #0b0e14; border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; box-sizing: border-box; transition: 0.2s; font-family: monospace; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+        .btn { background: var(--accent); color: #fff; border: none; padding: 14px; width: 100%; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px; }
+        .btn:hover { background: #0284c7; }
+        .result-box { margin-top: 24px; background: #0b0e14; padding: 16px; border-radius: 6px; border: 1px solid var(--border); position: relative; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.85rem; color: var(--accent); font-weight: 600; }
+        code { display: block; word-break: break-all; font-family: 'Consolas', monospace; font-size: 0.8rem; color: #cbd5e1; max-height: 120px; overflow-y: auto; line-height: 1.4; }
+        .copy-btn { background: transparent; border: 1px solid var(--border); color: #94a3b8; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .footer { margin-top: 30px; text-align: center; font-size: 0.75rem; color: #475569; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚡ TitanStallion 节点配置</h1>
+        <h1>🛡️ Titanium-V Core</h1>
         
         <div class="input-group">
-            <label>地址 (Address) - 优选IP/域名</label>
+            <label>地址 (Address) - 优选IP或CDN域名</label>
             <input type="text" id="address" value="www.shopify.com">
         </div>
         
@@ -474,27 +499,27 @@ const DASHBOARD_HTML = `
         </div>
 
         <div class="input-group">
-            <label>UUID (VLESS用户ID)</label>
-            <input type="text" id="uuid" placeholder="自动生成">
+            <label>UUID (VLESS 用户ID)</label>
+            <input type="text" id="uuid" placeholder="自动生成...">
         </div>
 
-        <div style="border-top: 1px solid var(--border); margin: 20px 0;"></div>
+        <div style="border-top: 1px solid var(--border); margin: 24px 0;"></div>
 
         <div class="input-group">
-            <label>SOCKS5 前置代理 (可选) - user:pass@ip:port</label>
-            <input type="text" id="s5" placeholder="例如: user:123@1.2.3.4:1080">
+            <label>SOCKS5 前置代理 (可选) - user:pass@host:port</label>
+            <input type="text" id="s5" placeholder="留空则不启用">
         </div>
 
         <div class="input-group">
-            <label>自定义反代 IP (可选) - ip:port</label>
-            <input type="text" id="pyip" placeholder="例如: 104.16.1.1:443">
+            <label>自定义反代 IP (可选) - host:port</label>
+            <input type="text" id="pyip" placeholder="留空则使用默认策略">
         </div>
 
-        <button class="btn" onclick="generate()">生成订阅链接</button>
+        <button class="btn" onclick="generate()">生成订阅配置</button>
 
         <div id="outputs"></div>
 
-        <div class="footer">ReactionMax v3.5 | TitanStallion Core</div>
+        <div class="footer">ReactionMax Engine v4.0 | Secured by Titanium-V</div>
     </div>
 
     <script>
@@ -518,7 +543,7 @@ const DASHBOARD_HTML = `
 
             // 构建 Path
             let path = \`/my-key=\${encodeURIComponent(key)}\`;
-            let alias = 'Titan';
+            let alias = 'Titanium-V';
             if (s5) { path += \`/s5=\${encodeURIComponent(s5)}\`; alias += '-S5'; }
             if (pyip) { path += \`/pyip=\${encodeURIComponent(pyip)}\`; alias += '-IP'; }
             path += '/'; // 闭合
@@ -545,7 +570,7 @@ const DASHBOARD_HTML = `
     headers:
       Host: \${workerHost}\`.trim();
 
-            renderOutput('VLESS 链接 (v2rayN)', vlessLink);
+            renderOutput('VLESS Link (v2rayN/Nekobox)', vlessLink);
             renderOutput('Clash / Meta YAML', clashConfig);
         }
 
@@ -566,8 +591,15 @@ const DASHBOARD_HTML = `
         function copyText(btn) {
             const text = btn.parentElement.nextElementSibling.nextElementSibling.value;
             navigator.clipboard.writeText(text).then(() => {
-                btn.textContent = '已复制';
-                setTimeout(() => btn.textContent = '复制', 2000);
+                const originalText = btn.textContent;
+                btn.textContent = '已复制!';
+                btn.style.color = '#0ea5e9';
+                btn.style.borderColor = '#0ea5e9';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
             });
         }
 
@@ -585,16 +617,19 @@ const FAKE_INDEX_HTML = `
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechNote | Digital Life</title>
     <style>
-        body { font-family: 'Georgia', serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px 20px; color: #333; }
+        body { font-family: 'Georgia', serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px 20px; color: #333; background: #fff; }
         header { border-bottom: 1px solid #eee; margin-bottom: 40px; padding-bottom: 20px; }
-        h1 { font-size: 2.5em; margin: 0; color: #2c3e50; }
-        .meta { color: #888; font-size: 0.9em; margin-top: 5px; }
+        h1 { font-size: 2.2em; margin: 0; color: #2c3e50; letter-spacing: -1px; }
+        .meta { color: #888; font-size: 0.9em; margin-top: 5px; font-style: italic; }
         article { margin-bottom: 50px; }
-        h2 { font-size: 1.8em; color: #34495e; margin-bottom: 10px; }
-        p { margin-bottom: 15px; }
-        .read-more { color: #3498db; text-decoration: none; font-weight: bold; }
+        h2 { font-size: 1.6em; color: #34495e; margin-bottom: 10px; font-weight: normal; }
+        p { margin-bottom: 15px; color: #555; }
+        .read-more { color: #3498db; text-decoration: none; font-weight: bold; font-size: 0.9em; }
+        .read-more:hover { text-decoration: underline; }
+        footer { margin-top: 80px; border-top: 1px solid #eee; padding-top: 20px; font-size: 0.8em; color: #aaa; text-align: center; }
     </style>
 </head>
 <body>
@@ -607,19 +642,26 @@ const FAKE_INDEX_HTML = `
         <h2>The Future of Cloud Computing</h2>
         <div class="meta">Posted on November 15, 2024</div>
         <p>As we move further into the digital age, serverless architectures are becoming increasingly prevalent. The ability to deploy code to the edge reduces latency and improves user experience significantly.</p>
-        <p>Developers are no longer bound by traditional infrastructure management, allowing for faster iteration cycles...</p>
+        <p>Developers are no longer bound by traditional infrastructure management, allowing for faster iteration cycles and reduced operational overhead. This shift is not just technical but cultural...</p>
         <a href="#" class="read-more">Read more →</a>
     </article>
 
     <article>
         <h2>Understanding WebSockets</h2>
         <div class="meta">Posted on October 28, 2024</div>
-        <p>Real-time communication has transformed how we interact with web applications. WebSockets provide a persistent connection between client and server, enabling instant data transfer.</p>
+        <p>Real-time communication has transformed how we interact with web applications. WebSockets provide a persistent connection between client and server, enabling instant data transfer without the overhead of HTTP polling.</p>
         <a href="#" class="read-more">Read more →</a>
     </article>
 
-    <footer style="margin-top: 80px; border-top: 1px solid #eee; padding-top: 20px; font-size: 0.8em; color: #888; text-align: center;">
-        &copy; 2024 TechNote Blog. All rights reserved.
+    <article>
+        <h2>Minimalism in Digital Design</h2>
+        <div class="meta">Posted on September 12, 2024</div>
+        <p>In a world of constant noise, digital minimalism offers a breath of fresh air. It focuses on the essential elements of design, stripping away the superfluous to reveal the core message.</p>
+        <a href="#" class="read-more">Read more →</a>
+    </article>
+
+    <footer>
+        &copy; 2024 TechNote Blog. All rights reserved. <br> Powered by Edge Computing.
     </footer>
 </body>
 </html>
