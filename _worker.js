@@ -1,16 +1,11 @@
 /**
  * Project: Titanium-V Core (TitanStallion Evolution)
- * Version: v4.0.0
+ * Version: v4.0.2 (Fix: Resolved global scope timer error)
  * * 🌟 核心优势 (Core Advantages):
  * 1. 隐蔽性极强: 完美的伪装机制，默认访问域名显示“TechNote”技术博客，仅在路径完全匹配密钥时显示控制面板。
  * 2. 高可用架构 (ReactionMax): 具备多策略自动重连、连接停滞检测、主动心跳机制，确保连接稳如泰山。
  * 3. 智能配置生成: 面板自动识别当前 Worker 域名 (Host)，支持自定义优选 IP 地址，一键生成 VLESS/Clash 配置。
  * 4. 生产级特性: 内置 SOCKS5 前置代理支持、流量吞吐量实时评分系统。
- *
- * 🚀 优化方向 (Optimization Roadmap):
- * 1. 内存管理: 已在 v4.0 中增加定期清理过期会话缓存的机制，防止长连接下的内存泄漏。
- * 2. 协议伪装: 建议配合 Cloudflare 优选 IP 使用，以降低被 SNI 阻断的风险。
- * 3. 传输层: 目前基于 TCP，未来可探索利用 HTTP/3 (QUIC) 改善高丢包环境下的表现。
  */
 
 import { connect } from 'cloudflare:sockets';
@@ -56,10 +51,15 @@ const 遥测记录器 = new 遥测();
 class 会话缓存 {
     constructor() { 
         this._映射 = new Map(); 
-        // [v4.0 优化] 定期清理过期缓存，防止内存泄漏
-        setInterval(() => this.清理(), 10 * 60 * 1000);
+        // 修复：移除全局 setInterval，改用惰性清理
     }
-    设置(键) { this._映射.set(键, Date.now()); }
+
+    设置(键) { 
+        this._映射.set(键, Date.now()); 
+        // 当 Map 大小超过 500 时尝试清理过期项，防止内存泄漏
+        if (this._映射.size > 500) this.清理();
+    }
+
     存在(键) {
         const 时间戳 = this._映射.get(键);
         if (!时间戳) return false;
@@ -69,6 +69,7 @@ class 会话缓存 {
         }
         return true;
     }
+
     清理() {
         const 现在 = Date.now();
         for (const [键, 时间戳] of this._映射) {
@@ -329,14 +330,16 @@ async function 处理WebSocket会话(服务端套接字, 请求) {
             let 连接尝试失败 = false;
 
             try {
-                // --- 动态连接策略链 ---
+                // --- 动态连接策略链 (v4.0.1 修正: 移除非法的 tls 属性) ---
                 const 连接工厂列表 = [];
                 const 代理IP = 路径参数['pyip'];
                 const S5参数 = 路径参数['s5'];
                 const 添加工厂 = (名称, 函数) => 连接工厂列表.push({ 名称, 函数 });
-                const 直连工厂 = () => connect({ hostname: 目标主机, port: Number(目标端口), tls: { servername: 目标主机 } });
-                const 兜底工厂 = () => { const [h, p] = 解析主机端口(全局配置.默认兜底反代, 目标端口); return connect({ hostname: h, port: Number(p), tls: { servername: 目标主机 } }); };
-                const 代理IP工厂 = () => { const [h, p] = 解析主机端口(代理IP, 目标端口); return connect({ hostname: h, port: Number(p), tls: { servername: 目标主机 } }); };
+                
+                // 修正点：Cloudflare connect() 不接受 tls 属性
+                const 直连工厂 = () => connect({ hostname: 目标主机, port: Number(目标端口) });
+                const 兜底工厂 = () => { const [h, p] = 解析主机端口(全局配置.默认兜底反代, 目标端口); return connect({ hostname: h, port: Number(p) }); };
+                const 代理IP工厂 = () => { const [h, p] = 解析主机端口(代理IP, 目标端口); return connect({ hostname: h, port: Number(p) }); };
                 const S5工厂 = () => 创建S5套接字(S5参数 || 全局配置.S5账号列表[0], 目标主机, 目标端口);
                 
                 if (全局配置.启用S5 && (检查主机是否在强制S5名单(目标主机) || 全局配置.启用全局S5 || S5参数)) {
@@ -506,12 +509,12 @@ const DASHBOARD_HTML = `
         <div style="border-top: 1px solid var(--border); margin: 24px 0;"></div>
 
         <div class="input-group">
-            <label>SOCKS5 前置代理 (可选) - user:pass@host:port</label>
+            <label>SOCKS5 前置代理 (可选) - 例如 user:pass@1.1.1.1:443</label>
             <input type="text" id="s5" placeholder="留空则不启用">
         </div>
 
         <div class="input-group">
-            <label>自定义反代 IP (可选) - host:port</label>
+            <label>自定义反代 IP (可选) - 例如 1.1.1.1:443</label>
             <input type="text" id="pyip" placeholder="留空则使用默认策略">
         </div>
 
@@ -519,7 +522,7 @@ const DASHBOARD_HTML = `
 
         <div id="outputs"></div>
 
-        <div class="footer">ReactionMax Engine v4.0 | Secured by Titanium-V</div>
+        <div class="footer">ReactionMax Engine v4.0.2 | Secured by Titanium-V</div>
     </div>
 
     <script>
